@@ -13,7 +13,7 @@ export const zerg: GameAction[] = [
   unit("overlord", "Overlord", "OL", [100, 0], 18, 0, { supplyCap: 8, aliases: ["ovie", "ol"] }),
   unit("queen", "Queen", "Qn", [150, 0], 36, 2),
   // One larva hatches a pair of zerglings: 1 supply, 50 minerals.
-  unit("zergling", "Zergling ×2", "Ling", [50, 0], 17, 1, { aliases: ["ling", "zergling", "pair"] }),
+  unit("zergling", "Zergling", "Ling", [50, 0], 17, 1, { aliases: ["ling", "zergling", "pair"] }),
   unit("baneling", "Baneling", "Bane", [25, 25], 14, 0, { aliases: ["bane"] }),
   unit("roach", "Roach", "Rch", [75, 25], 19, 2),
   unit("ravager", "Ravager", "Rvg", [25, 75], 9, 1),
