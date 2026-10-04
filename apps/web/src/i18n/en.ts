@@ -13,6 +13,8 @@ export const en = {
     vs: 'vs',
     copied: 'Copied',
     clipboardError: 'Could not access the clipboard',
+    keySpace: 'Space',
+    keyDelete: 'Del',
   },
   races: { T: 'Terran', Z: 'Zerg', P: 'Protoss', R: 'Random' },
   matchup: '{race} versus {vsRace}',

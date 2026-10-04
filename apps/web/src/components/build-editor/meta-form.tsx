@@ -4,7 +4,6 @@ import {
   OPPONENT_RACES,
   type OpponentRace,
   RACES,
-  RACE_NAMES,
   type Race,
   type Visibility,
 } from '@sybo/shared'
@@ -14,6 +13,7 @@ import { Field, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
+import { useI18n } from '@/i18n'
 import { CommitInput } from './commit-input'
 import type { EditorMeta } from './editor-state'
 
@@ -24,11 +24,11 @@ type Props = {
   titleError?: string
 }
 
-const VISIBILITY_LABELS: Record<Visibility, string> = {
-  public: 'Public — listed on ShareYourBO',
-  unlisted: 'Unlisted — only people with the link',
-  private: 'Private — only you',
-}
+const VISIBILITY_KEYS = {
+  public: 'editor.meta.visibilityPublic',
+  unlisted: 'editor.meta.visibilityUnlisted',
+  private: 'editor.meta.visibilityPrivate',
+} as const satisfies Record<Visibility, string>
 
 function RaceToggle<R extends OpponentRace>({
   races,
@@ -41,6 +41,7 @@ function RaceToggle<R extends OpponentRace>({
   onChange: (race: R) => void
   label: string
 }) {
+  const { t } = useI18n()
   return (
     <ToggleGroup
       type="single"
@@ -54,8 +55,8 @@ function RaceToggle<R extends OpponentRace>({
         <ToggleGroupItem
           key={race}
           value={race}
-          aria-label={RACE_NAMES[race]}
-          title={RACE_NAMES[race]}
+          aria-label={t(`races.${race}`)}
+          title={t(`races.${race}`)}
           className={cn('w-10 font-heading font-bold', raceClasses[race].on)}
         >
           {race}
@@ -66,17 +67,18 @@ function RaceToggle<R extends OpponentRace>({
 }
 
 export function MetaForm({ meta, onChange, onRaceChange, titleError }: Props) {
+  const { t } = useI18n()
   return (
     <FieldGroup className="gap-4">
       <Field data-invalid={!!titleError || undefined}>
         <FieldLabel htmlFor="build-title" className="sr-only">
-          Title
+          {t('editor.meta.title')}
         </FieldLabel>
         <CommitInput
           id="build-title"
           value={meta.title}
           onCommit={(title) => onChange({ title })}
-          placeholder="Name your build — e.g. “2 Base Blink into Charge”"
+          placeholder={t('editor.meta.titlePlaceholder')}
           maxLength={100}
           aria-invalid={!!titleError}
           className="h-12 border-input px-3 font-heading text-xl font-semibold md:text-2xl dark:bg-input/30"
@@ -86,15 +88,15 @@ export function MetaForm({ meta, onChange, onRaceChange, titleError }: Props) {
 
       <div className="flex flex-wrap items-end gap-x-6 gap-y-4">
         <Field className="w-auto">
-          <FieldLabel>Race</FieldLabel>
-          <RaceToggle races={RACES} value={meta.race} onChange={onRaceChange} label="Your race" />
+          <FieldLabel>{t('editor.meta.race')}</FieldLabel>
+          <RaceToggle races={RACES} value={meta.race} onChange={onRaceChange} label={t('editor.meta.yourRace')} />
         </Field>
         <Field className="w-auto">
-          <FieldLabel>Versus</FieldLabel>
-          <RaceToggle races={OPPONENT_RACES} value={meta.vsRace} onChange={(vsRace) => onChange({ vsRace })} label="Opponent race" />
+          <FieldLabel>{t('editor.meta.versus')}</FieldLabel>
+          <RaceToggle races={OPPONENT_RACES} value={meta.vsRace} onChange={(vsRace) => onChange({ vsRace })} label={t('editor.meta.opponentRace')} />
         </Field>
         <Field className="w-28">
-          <FieldLabel htmlFor="build-patch">Patch</FieldLabel>
+          <FieldLabel htmlFor="build-patch">{t('editor.meta.patch')}</FieldLabel>
           <CommitInput
             id="build-patch"
             value={meta.patch}
@@ -105,16 +107,16 @@ export function MetaForm({ meta, onChange, onRaceChange, titleError }: Props) {
           />
         </Field>
         <Field className="w-auto min-w-64">
-          <FieldLabel htmlFor="build-visibility">Visibility</FieldLabel>
+          <FieldLabel htmlFor="build-visibility">{t('editor.meta.visibility')}</FieldLabel>
           <Select value={meta.visibility} onValueChange={(v) => onChange({ visibility: v as Visibility })}>
             <SelectTrigger id="build-visibility">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
-                {(Object.keys(VISIBILITY_LABELS) as Visibility[]).map((v) => (
+                {(Object.keys(VISIBILITY_KEYS) as Visibility[]).map((v) => (
                   <SelectItem key={v} value={v}>
-                    {VISIBILITY_LABELS[v]}
+                    {t(VISIBILITY_KEYS[v])}
                   </SelectItem>
                 ))}
               </SelectGroup>
@@ -124,7 +126,7 @@ export function MetaForm({ meta, onChange, onRaceChange, titleError }: Props) {
       </div>
 
       <Field>
-        <FieldLabel>Tags (up to 4)</FieldLabel>
+        <FieldLabel>{t('editor.meta.tags')}</FieldLabel>
         <ToggleGroup
           type="multiple"
           variant="outline"
@@ -132,24 +134,24 @@ export function MetaForm({ meta, onChange, onRaceChange, titleError }: Props) {
           value={meta.tags}
           onValueChange={(tags) => tags.length <= 4 && onChange({ tags: tags as BuildTag[] })}
           className="flex-wrap"
-          aria-label="Tags"
+          aria-label={t('editor.meta.tags')}
         >
           {BUILD_TAGS.map((tag) => (
-            <ToggleGroupItem key={tag} value={tag} className="capitalize data-[state=on]:border-primary/50 data-[state=on]:bg-primary/15 data-[state=on]:text-primary">
-              {tag}
+            <ToggleGroupItem key={tag} value={tag} className="data-[state=on]:border-primary/50 data-[state=on]:bg-primary/15 data-[state=on]:text-primary">
+              {t(`tags.${tag}`)}
             </ToggleGroupItem>
           ))}
         </ToggleGroup>
       </Field>
 
       <Field>
-        <FieldLabel htmlFor="build-description">Description</FieldLabel>
+        <FieldLabel htmlFor="build-description">{t('editor.meta.description')}</FieldLabel>
         <Textarea
           key={meta.description}
           id="build-description"
           defaultValue={meta.description}
           onBlur={(e) => e.target.value !== meta.description && onChange({ description: e.target.value })}
-          placeholder="When to use it, what to scout for, how to transition…"
+          placeholder={t('editor.meta.descriptionPlaceholder')}
           maxLength={2000}
           rows={3}
         />

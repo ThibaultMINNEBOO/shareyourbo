@@ -34,7 +34,7 @@ function NewBuildPage() {
   return <BuildEditor
       key={fork ?? 'new'}
       initialDoc={doc}
-      heading={fork ? 'Fork build' : 'New build'}
+      headingKey={fork ? 'editor.forkBuild' : 'editor.newBuild'}
       draftKey={fork ? `fork:${fork}` : 'new'}
     />
 }

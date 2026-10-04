@@ -1,4 +1,4 @@
-import { type ImportedStep, RACE_NAMES, type Race, parseBuildText } from '@sybo/shared'
+import { type ImportedStep, type Race, parseBuildText } from '@sybo/shared'
 import { ClipboardPasteIcon } from 'lucide-react'
 import { useDeferredValue, useMemo, useState } from 'react'
 import { Alert, AlertDescription } from '@/components/ui/alert'
@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/dialog'
 import { Field, FieldDescription, FieldLabel } from '@/components/ui/field'
 import { Textarea } from '@/components/ui/textarea'
+import { useI18n } from '@/i18n'
 
 const PLACEHOLDER = `13  0:12  Overlord
 16  0:48  Hatchery
@@ -29,6 +30,7 @@ type Props = {
 
 export function ImportDialog({ race, hasSteps, onImport }: Props) {
   const [open, setOpen] = useState(false)
+  const { t } = useI18n()
   const [text, setText] = useState('')
   const deferred = useDeferredValue(text)
   const result = useMemo(() => parseBuildText(deferred, race), [deferred, race])
@@ -46,19 +48,17 @@ export function ImportDialog({ race, hasSteps, onImport }: Props) {
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
           <ClipboardPasteIcon data-icon="inline-start" />
-          Import
+          {t('editor.import.button')}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
-          <DialogTitle>Import a build</DialogTitle>
-          <DialogDescription>
-            Paste a build copied from Spawning Tool, Liquipedia or a notepad. One step per line.
-          </DialogDescription>
+          <DialogTitle>{t('editor.import.title')}</DialogTitle>
+          <DialogDescription>{t('editor.import.description')}</DialogDescription>
         </DialogHeader>
         <Field>
           <FieldLabel htmlFor="import-text" className="sr-only">
-            Build text
+            {t('editor.import.label')}
           </FieldLabel>
           <Textarea
             id="import-text"
@@ -71,26 +71,29 @@ export function ImportDialog({ race, hasSteps, onImport }: Props) {
           />
           <FieldDescription>
             {count === 0
-              ? 'Supply and time are optional: “14 0:18 Pylon”, “Queen x2”, “# Opening” for sections.'
-              : `${count} step${count === 1 ? '' : 's'} found${result.unmatched ? ` · ${result.unmatched} kept as text` : ''}${
-                  result.race ? ` · ${RACE_NAMES[result.race]}` : ''
-                }`}
+              ? t('editor.import.hint')
+              : [
+                  t('editor.import.found', { count }),
+                  result.unmatched ? t('editor.import.keptAsText', { count: result.unmatched }) : null,
+                  result.race ? t(`races.${result.race}`) : null,
+                ]
+                  .filter(Boolean)
+                  .join(' · ')}
           </FieldDescription>
         </Field>
         {otherRace && hasSteps && (
           <Alert>
             <AlertDescription>
-              This looks like a {RACE_NAMES[otherRace]} build but yours is {RACE_NAMES[race]}. Steps will be added
-              anyway.
+              {t('editor.import.otherRace', { other: t(`races.${otherRace}`), race: t(`races.${race}`) })}
             </AlertDescription>
           </Alert>
         )}
         <DialogFooter>
           <Button variant="ghost" onClick={() => setOpen(false)}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button onClick={submit} disabled={result.steps.length === 0}>
-            Add {count || ''} step{count === 1 ? '' : 's'}
+            {t('editor.import.submit', { count })}
           </Button>
         </DialogFooter>
       </DialogContent>

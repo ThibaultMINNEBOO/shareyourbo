@@ -16,6 +16,7 @@ import { ListPlusIcon } from 'lucide-react'
 import { useMemo } from 'react'
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
 import { Kbd } from '@/components/ui/kbd'
+import { useI18n } from '@/i18n'
 import type { EditorAction } from './editor-state'
 import { StepRow } from './step-row'
 
@@ -48,6 +49,7 @@ type Props = {
 
 export function StepTable({ steps, race, selected, dispatch }: Props) {
   const supplies = useMemo(() => computeSupply(race, steps), [race, steps])
+  const { t, rich } = useI18n()
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 4 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
@@ -67,10 +69,17 @@ export function StepTable({ steps, race, selected, dispatch }: Props) {
           <EmptyMedia variant="icon">
             <ListPlusIcon />
           </EmptyMedia>
-          <EmptyTitle>No steps yet</EmptyTitle>
+          <EmptyTitle>{t('editor.table.emptyTitle')}</EmptyTitle>
           <EmptyDescription>
-            Pick actions from the palette, or press <Kbd>/</Kbd> and type: <span className="font-mono">2 probe</span>{' '}
-            <Kbd>⏎</Kbd> <span className="font-mono">pylon</span> <Kbd>⏎</Kbd>
+            {rich('editor.table.emptyHint', {
+              slash: <Kbd>/</Kbd>,
+              example: (
+                <>
+                  <span className="font-mono">2 probe</span> <Kbd>⏎</Kbd> <span className="font-mono">pylon</span>{' '}
+                  <Kbd>⏎</Kbd>
+                </>
+              ),
+            })}
           </EmptyDescription>
         </EmptyHeader>
       </Empty>
@@ -78,13 +87,13 @@ export function StepTable({ steps, race, selected, dispatch }: Props) {
   }
 
   return (
-    <div className="flex flex-col gap-0.5" role="list" aria-label="Build steps">
+    <div className="flex flex-col gap-0.5" role="list" aria-label={t('editor.table.label')}>
       <div className="hidden grid-cols-[1.25rem_3rem_3.75rem_minmax(0,1.1fr)_minmax(0,1fr)_2rem] gap-x-1 px-1 pb-1 text-xs font-medium text-muted-foreground lg:grid">
         <span />
-        <span className="pr-1.5 text-right">Supply</span>
-        <span className="px-1.5">Time</span>
-        <span className="px-1.5">Action</span>
-        <span className="px-3">Note</span>
+        <span className="pr-1.5 text-right">{t('editor.table.supply')}</span>
+        <span className="px-1.5">{t('editor.table.time')}</span>
+        <span className="px-1.5">{t('editor.table.action')}</span>
+        <span className="px-3">{t('editor.table.note')}</span>
       </div>
       <DndContext
         sensors={sensors}
@@ -110,7 +119,7 @@ export function StepTable({ steps, race, selected, dispatch }: Props) {
                   onDuplicate={() => dispatch({ type: 'duplicate', index })}
                   onMove={(direction) => dispatch({ type: 'move', from: index, to: index + direction })}
                   onInsertSection={() =>
-                    dispatch({ type: 'insert', at: index, steps: [{ kind: 'section', count: 1, label: 'New section' }] })
+                    dispatch({ type: 'insert', at: index, steps: [{ kind: 'section', count: 1, label: t('editor.newSection') }] })
                   }
                 />
               )}

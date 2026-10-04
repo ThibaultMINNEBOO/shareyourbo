@@ -1,4 +1,4 @@
-import { RACE_NAMES, type Race, type Step, buildInputSchema, getAction } from '@sybo/shared'
+import { type Race, type Step, buildInputSchema, getAction } from '@sybo/shared'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useBlocker, useNavigate } from '@tanstack/react-router'
 import { EyeIcon, HeadingIcon, HistoryIcon, ListPlusIcon, PlusIcon, Redo2Icon, SaveIcon, Undo2Icon } from 'lucide-react'
@@ -22,6 +22,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sh
 import { Spinner } from '@/components/ui/spinner'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { type TextKey, useI18n } from '@/i18n'
 import { api, unwrap } from '@/lib/api'
 import { useFormat } from '@/lib/format'
 import { ActionPalette, type PaletteSelection } from './action-palette'
@@ -36,12 +37,12 @@ type Props = {
   initialDoc: EditorDoc
   /** Present when editing an existing build. */
   buildId?: string
-  heading: string
+  headingKey: TextKey
   /** localStorage key for the unsaved draft of this editor session. */
   draftKey: string
 }
 
-export function BuildEditor({ initialDoc, buildId, heading, draftKey }: Props) {
+export function BuildEditor({ initialDoc, buildId, headingKey, draftKey }: Props) {
   const [state, dispatch] = useReducer(editorReducer, initialDoc, initEditor)
   const { doc, selected } = state
   const paletteInput = useRef<HTMLInputElement>(null)
@@ -51,6 +52,7 @@ export function BuildEditor({ initialDoc, buildId, heading, draftKey }: Props) {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { timeAgo } = useFormat()
+  const { t } = useI18n()
 
   const dirty = state.past.length > 0
   const save = useMutation({
@@ -62,7 +64,7 @@ export function BuildEditor({ initialDoc, buildId, heading, draftKey }: Props) {
       clearDraft(draftKey)
       await queryClient.invalidateQueries({ queryKey: ['builds'] })
       await queryClient.invalidateQueries({ queryKey: ['build', slug] })
-      toast.success(buildId ? 'Build updated' : 'Build published')
+      toast.success(buildId ? t('editor.updated') : t('editor.published'))
       navigate({ to: '/b/$slug', params: { slug }, ignoreBlocker: true })
     },
     onError: (error) => toast.error(error.message),
@@ -79,7 +81,7 @@ export function BuildEditor({ initialDoc, buildId, heading, draftKey }: Props) {
   useEditorShortcuts(state, dispatch, focusPalette)
 
   useBlocker({
-    shouldBlockFn: () => dirty && !save.isSuccess && !window.confirm('Leave the editor? Unsaved changes will be lost.'),
+    shouldBlockFn: () => dirty && !save.isSuccess && !window.confirm(t('editor.leaveConfirm')),
     enableBeforeUnload: () => dirty && !save.isSuccess,
   })
 
@@ -88,7 +90,7 @@ export function BuildEditor({ initialDoc, buildId, heading, draftKey }: Props) {
   }
 
   function addSection() {
-    dispatch({ type: 'insert', steps: [{ kind: 'section', count: 1, label: 'New section' }] })
+    dispatch({ type: 'insert', steps: [{ kind: 'section', count: 1, label: t('editor.newSection') }] })
   }
 
   const foreignSteps = (race: Race) =>
@@ -123,9 +125,9 @@ export function BuildEditor({ initialDoc, buildId, heading, draftKey }: Props) {
     const parsed = buildInputSchema.safeParse(input)
     if (!parsed.success) {
       const titleIssue = parsed.error.issues.find((i) => i.path[0] === 'title')
-      setTitleError(titleIssue ? 'Give your build a title (3 characters minimum)' : undefined)
+      setTitleError(titleIssue ? t('editor.titleError') : undefined)
       const stepsIssue = parsed.error.issues.find((i) => i.path[0] === 'steps')
-      toast.error(titleIssue ? 'Your build needs a title' : stepsIssue ? 'Add at least one step' : parsed.error.issues[0]!.message)
+      toast.error(titleIssue ? t('editor.needTitle') : stepsIssue ? t('editor.needSteps') : t('editor.invalid'))
       return
     }
     setTitleError(undefined)
@@ -139,27 +141,27 @@ export function BuildEditor({ initialDoc, buildId, heading, draftKey }: Props) {
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-6">
       <div className="sticky top-14 z-30 -mx-4 flex items-center gap-2 border-b bg-background/90 px-4 py-2 backdrop-blur">
-        <h1 className="font-heading text-lg font-semibold">{heading}</h1>
+        <h1 className="font-heading text-lg font-semibold">{t(headingKey)}</h1>
         <div className="ml-auto flex items-center gap-1">
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" onClick={() => dispatch({ type: 'undo' })} disabled={!state.past.length} aria-label="Undo">
+              <Button variant="ghost" size="icon" onClick={() => dispatch({ type: 'undo' })} disabled={!state.past.length} aria-label={t('editor.undo')}>
                 <Undo2Icon />
               </Button>
             </TooltipTrigger>
-            <TooltipContent>Undo (⌘Z)</TooltipContent>
+            <TooltipContent>{t('editor.undo')} (⌘Z)</TooltipContent>
           </Tooltip>
           <Tooltip>
             <TooltipTrigger asChild>
-              <Button variant="ghost" size="icon" onClick={() => dispatch({ type: 'redo' })} disabled={!state.future.length} aria-label="Redo">
+              <Button variant="ghost" size="icon" onClick={() => dispatch({ type: 'redo' })} disabled={!state.future.length} aria-label={t('editor.redo')}>
                 <Redo2Icon />
               </Button>
             </TooltipTrigger>
-            <TooltipContent>Redo (⌘⇧Z)</TooltipContent>
+            <TooltipContent>{t('editor.redo')} (⌘⇧Z)</TooltipContent>
           </Tooltip>
           <Button onClick={submit} disabled={save.isPending}>
             {save.isPending ? <Spinner data-icon="inline-start" /> : <SaveIcon data-icon="inline-start" />}
-            {buildId ? 'Save' : 'Publish'}
+            {buildId ? t('editor.save') : t('editor.publish')}
           </Button>
         </div>
       </div>
@@ -167,13 +169,13 @@ export function BuildEditor({ initialDoc, buildId, heading, draftKey }: Props) {
       {draft.draft && (
         <Alert>
           <HistoryIcon />
-          <AlertTitle>Unsaved draft found</AlertTitle>
+          <AlertTitle>{t('editor.draftTitle')}</AlertTitle>
           <AlertDescription>
-            You have changes from {timeAgo(new Date(draft.draft.savedAt))} that were never saved.
+            {t('editor.draftDescription', { time: timeAgo(new Date(draft.draft.savedAt)) })}
           </AlertDescription>
           <AlertAction className="flex gap-2">
             <Button size="sm" variant="ghost" onClick={draft.dismiss}>
-              Discard
+              {t('editor.discard')}
             </Button>
             <Button
               size="sm"
@@ -182,7 +184,7 @@ export function BuildEditor({ initialDoc, buildId, heading, draftKey }: Props) {
                 draft.consume()
               }}
             >
-              Restore
+              {t('editor.restore')}
             </Button>
           </AlertAction>
         </Alert>
@@ -199,9 +201,9 @@ export function BuildEditor({ initialDoc, buildId, heading, draftKey }: Props) {
       />
 
       <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
-        <section className="flex flex-col gap-3" aria-label="Steps">
+        <section className="flex flex-col gap-3" aria-label={t('editor.steps')}>
           <div className="flex items-center gap-2">
-            <h2 className="font-heading text-base font-semibold">Steps</h2>
+            <h2 className="font-heading text-base font-semibold">{t('editor.steps')}</h2>
             <span className="text-sm text-muted-foreground">{doc.steps.filter((s) => s.kind === 'step').length}</span>
             <div className="ml-auto" />
             <ImportDialog
@@ -216,12 +218,12 @@ export function BuildEditor({ initialDoc, buildId, heading, draftKey }: Props) {
                 } else {
                   dispatch({ type: 'insert', at: doc.steps.length, steps })
                 }
-                toast.success(`Imported ${steps.length} step${steps.length === 1 ? '' : 's'}`)
+                toast.success(t('editor.imported', { count: steps.length }))
               }}
             />
             <Button variant="outline" size="sm" onClick={addSection}>
               <HeadingIcon data-icon="inline-start" />
-              Section
+              {t('editor.section')}
             </Button>
           </div>
           <StepTable steps={doc.steps} race={doc.meta.race} selected={selected} dispatch={dispatch} />
@@ -231,10 +233,10 @@ export function BuildEditor({ initialDoc, buildId, heading, draftKey }: Props) {
           <Tabs defaultValue="add">
             <TabsList className="w-full">
               <TabsTrigger value="add">
-                <ListPlusIcon /> Add steps
+                <ListPlusIcon /> {t('editor.addSteps')}
               </TabsTrigger>
               <TabsTrigger value="preview">
-                <EyeIcon /> Preview
+                <EyeIcon /> {t('editor.preview')}
               </TabsTrigger>
             </TabsList>
             <TabsContent value="add">{palette}</TabsContent>
@@ -244,7 +246,7 @@ export function BuildEditor({ initialDoc, buildId, heading, draftKey }: Props) {
                   {doc.steps.length ? (
                     <StepList steps={doc.steps} race={doc.meta.race} />
                   ) : (
-                    <p className="py-6 text-center text-sm text-muted-foreground">Nothing to preview yet.</p>
+                    <p className="py-6 text-center text-sm text-muted-foreground">{t('editor.nothingToPreview')}</p>
                   )}
                 </CardContent>
               </Card>
@@ -259,12 +261,12 @@ export function BuildEditor({ initialDoc, buildId, heading, draftKey }: Props) {
         onClick={() => setPaletteSheetOpen(true)}
       >
         <PlusIcon data-icon="inline-start" />
-        Add step
+        {t('editor.addStep')}
       </Button>
       <Sheet open={paletteSheetOpen} onOpenChange={setPaletteSheetOpen}>
         <SheetContent side="bottom" className="max-h-[85svh]">
           <SheetHeader>
-            <SheetTitle>Add a step</SheetTitle>
+            <SheetTitle>{t('editor.addStep')}</SheetTitle>
           </SheetHeader>
           <div className="px-4 pb-4">
             <ActionPalette race={doc.meta.race} onPick={addFromPalette} listClassName="max-h-[55svh]" />
@@ -275,15 +277,18 @@ export function BuildEditor({ initialDoc, buildId, heading, draftKey }: Props) {
       <AlertDialog open={!!pendingRace} onOpenChange={(open) => !open && setPendingRace(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Switch to {pendingRace && RACE_NAMES[pendingRace]}?</AlertDialogTitle>
+            <AlertDialogTitle>{pendingRace && t('editor.raceSwitchTitle', { race: t(`races.${pendingRace}`) })}</AlertDialogTitle>
             <AlertDialogDescription>
-              {pendingRace && foreignSteps(pendingRace)} step(s) use {RACE_NAMES[doc.meta.race]} actions and will be removed. Text
-              steps and sections are kept. You can undo this.
+              {pendingRace &&
+                t('editor.raceSwitchDescription', {
+                  count: foreignSteps(pendingRace),
+                  race: t(`races.${doc.meta.race}`),
+                })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmRaceChange}>Switch race</AlertDialogAction>
+            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmRaceChange}>{t('editor.raceSwitchConfirm')}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

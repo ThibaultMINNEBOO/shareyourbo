@@ -24,6 +24,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { useI18n } from '@/i18n'
 import { ActionPalette } from './action-palette'
 import { CommitInput } from './commit-input'
 import type { StepPatch } from './editor-state'
@@ -66,10 +67,11 @@ export function StepRow(props: Props) {
 }
 
 function DragHandle({ handleProps }: Pick<Props, 'handleProps'>) {
+  const { t } = useI18n()
   return (
     <button
       type="button"
-      aria-label="Drag to reorder"
+      aria-label={t('editor.table.drag')}
       className="flex h-8 cursor-grab touch-none items-center justify-center text-muted-foreground/50 hover:text-foreground active:cursor-grabbing"
       {...handleProps}
     >
@@ -79,13 +81,14 @@ function DragHandle({ handleProps }: Pick<Props, 'handleProps'>) {
 }
 
 function SectionRow({ step, onUpdate, handleProps, ...rest }: Props) {
+  const { t } = useI18n()
   return (
     <div className="grid grid-cols-[1.25rem_minmax(0,1fr)_2rem] items-center gap-1 px-1 py-1">
       <DragHandle handleProps={handleProps} />
       <CommitInput
         value={step.label ?? ''}
         onCommit={(label) => label.trim() && onUpdate({ label: label.trim() })}
-        aria-label="Section title"
+        aria-label={t('editor.table.sectionTitle')}
         maxLength={80}
         className="font-heading text-sm font-semibold tracking-wider text-primary uppercase"
       />
@@ -96,6 +99,7 @@ function SectionRow({ step, onUpdate, handleProps, ...rest }: Props) {
 
 function ActionRow({ step, supply, race, onUpdate, handleProps, ...rest }: Props) {
   const [picking, setPicking] = useState(false)
+  const { t } = useI18n()
   return (
     <div className="grid grid-cols-[1.25rem_3rem_3.75rem_minmax(0,1fr)_2rem] items-center gap-x-1 px-1 py-1 lg:grid-cols-[1.25rem_3rem_3.75rem_minmax(0,1.1fr)_minmax(0,1fr)_2rem]">
       <DragHandle handleProps={handleProps} />
@@ -110,8 +114,8 @@ function ActionRow({ step, supply, race, onUpdate, handleProps, ...rest }: Props
             else if (Number.isInteger(n) && n >= 0 && n <= 200) onUpdate({ supply: n })
           }}
           inputMode="numeric"
-          aria-label="Supply"
-          title={step.supply === undefined ? 'Suggested supply — type to override' : 'Supply (clear to use the suggestion)'}
+          aria-label={t('editor.table.supply')}
+          title={step.supply === undefined ? t('editor.table.supplySuggested') : t('editor.table.supplyManual')}
           className={cn(
             'px-1.5 text-right font-mono tabular-nums placeholder:text-muted-foreground/70',
             step.supply !== undefined && 'font-semibold',
@@ -123,11 +127,11 @@ function ActionRow({ step, supply, race, onUpdate, handleProps, ...rest }: Props
             <TooltipTrigger asChild>
               <TriangleAlertIcon
                 className="absolute -top-1 -left-1 size-3.5 text-destructive"
-                aria-label="Supply blocked"
+                aria-label={t('editor.table.supplyBlockedLabel')}
               />
             </TooltipTrigger>
             <TooltipContent>
-              Supply blocked: {supply.supply}/{supply.cap}. Add a supply structure earlier.
+              {t('editor.table.supplyBlocked', { supply: supply.supply, cap: supply.cap })}
             </TooltipContent>
           </Tooltip>
         )}
@@ -141,7 +145,7 @@ function ActionRow({ step, supply, race, onUpdate, handleProps, ...rest }: Props
           const seconds = parseTime(value)
           if (seconds !== null) onUpdate({ time: seconds })
         }}
-        aria-label="Game time"
+        aria-label={t('editor.table.gameTime')}
         className="px-1.5 font-mono tabular-nums placeholder:text-muted-foreground/50"
       />
 
@@ -151,7 +155,7 @@ function ActionRow({ step, supply, race, onUpdate, handleProps, ...rest }: Props
             <button
               type="button"
               className="flex h-8 min-w-0 flex-1 items-center rounded-md px-1.5 text-left text-sm hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
-              aria-label="Change action"
+              aria-label={t('editor.table.changeAction')}
             >
               <ActionLabel actionId={step.actionId} label={step.label} />
             </button>
@@ -160,7 +164,7 @@ function ActionRow({ step, supply, race, onUpdate, handleProps, ...rest }: Props
             <ActionPalette
               race={race}
               autoFocus
-              placeholder="Replace with…"
+              placeholder={t('editor.table.replaceWith')}
               listClassName="max-h-72"
               className="border-0"
               onPick={({ actionId, label, count }) => {
@@ -177,18 +181,18 @@ function ActionRow({ step, supply, race, onUpdate, handleProps, ...rest }: Props
             if (Number.isInteger(n) && n >= 1 && n <= 50) onUpdate({ count: n })
           }}
           inputMode="numeric"
-          aria-label="Count"
-          title="Count"
+          aria-label={t('editor.table.count')}
+          title={t('editor.table.count')}
           className="w-11 shrink-0 px-1 text-center font-mono tabular-nums"
         />
       </div>
 
       <CommitInput
         value={step.note ?? ''}
-        placeholder="Note"
+        placeholder={t('editor.table.note')}
         maxLength={280}
         onCommit={(note) => onUpdate({ note: note.trim() || undefined })}
-        aria-label="Note"
+        aria-label={t('editor.table.note')}
         className="col-span-3 col-start-3 text-muted-foreground placeholder:text-muted-foreground/40 lg:col-span-1 lg:col-start-auto"
       />
 
@@ -200,34 +204,35 @@ function ActionRow({ step, supply, race, onUpdate, handleProps, ...rest }: Props
 }
 
 function RowMenu({ step, onRemove, onDuplicate, onMove, onInsertSection, isFirst, isLast }: Props) {
+  const { t } = useI18n()
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon-sm" aria-label="Step actions" className="opacity-60 group-hover/row:opacity-100">
+        <Button variant="ghost" size="icon-sm" aria-label={t('editor.table.stepActions')} className="opacity-60 group-hover/row:opacity-100">
           <MoreHorizontalIcon />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="min-w-52">
         <DropdownMenuGroup>
           <DropdownMenuItem onSelect={() => onMove(-1)} disabled={isFirst}>
-            <ArrowUpIcon /> Move up <DropdownMenuShortcut>⌥↑</DropdownMenuShortcut>
+            <ArrowUpIcon /> {t('editor.table.moveUp')} <DropdownMenuShortcut>⌥↑</DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuItem onSelect={() => onMove(1)} disabled={isLast}>
-            <ArrowDownIcon /> Move down <DropdownMenuShortcut>⌥↓</DropdownMenuShortcut>
+            <ArrowDownIcon /> {t('editor.table.moveDown')} <DropdownMenuShortcut>⌥↓</DropdownMenuShortcut>
           </DropdownMenuItem>
           {step.kind === 'step' && (
             <DropdownMenuItem onSelect={onDuplicate}>
-              <CopyIcon /> Duplicate <DropdownMenuShortcut>⌘D</DropdownMenuShortcut>
+              <CopyIcon /> {t('editor.table.duplicate')} <DropdownMenuShortcut>⌘D</DropdownMenuShortcut>
             </DropdownMenuItem>
           )}
           <DropdownMenuItem onSelect={onInsertSection}>
-            <HeadingIcon /> Insert section above
+            <HeadingIcon /> {t('editor.table.insertSection')}
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem variant="destructive" onSelect={onRemove}>
-            <Trash2Icon /> Delete <DropdownMenuShortcut>Del</DropdownMenuShortcut>
+            <Trash2Icon /> {t('editor.table.delete')} <DropdownMenuShortcut>{t('common.keyDelete')}</DropdownMenuShortcut>
           </DropdownMenuItem>
         </DropdownMenuGroup>
       </DropdownMenuContent>

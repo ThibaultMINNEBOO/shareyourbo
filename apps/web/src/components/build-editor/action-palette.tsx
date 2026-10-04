@@ -1,6 +1,5 @@
 import {
   ACTIONS_BY_RACE,
-  ACTION_KIND_LABELS,
   type ActionKind,
   type GameAction,
   type Race,
@@ -12,6 +11,7 @@ import { useMemo, useState } from 'react'
 import { ActionBadge } from '@/components/build/action-chip'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
 import { Kbd } from '@/components/ui/kbd'
+import { useI18n } from '@/i18n'
 import { parseQuickEntry } from './editor-state'
 
 export type PaletteSelection = { actionId?: string; label?: string; count: number }
@@ -35,6 +35,7 @@ type Props = {
  */
 export function ActionPalette({ race, onPick, inputRef, autoFocus, placeholder, className, listClassName }: Props) {
   const [input, setInput] = useState('')
+  const { t, rich } = useI18n()
   const { count, query } = parseQuickEntry(input)
   const results = useMemo(() => (query ? searchActions(race, query) : []), [race, query])
   const grouped = useMemo(
@@ -68,13 +69,13 @@ export function ActionPalette({ race, onPick, inputRef, autoFocus, placeholder, 
           const next = parseQuickEntry(value).query
           setHighlighted(next ? (searchActions(race, next)[0]?.id ?? NOTE_VALUE) : '')
         }}
-        placeholder={placeholder ?? 'Add a step… e.g. "2 probe", "rax"'}
-        aria-label="Search actions"
+        placeholder={placeholder ?? t('editor.palette.placeholder')}
+        aria-label={t('editor.palette.search')}
       />
       <CommandList className={cn('max-h-none', listClassName)}>
         {query ? (
           <>
-            <CommandGroup heading={count > 1 ? `Add ×${count}` : 'Best matches'}>
+            <CommandGroup heading={count > 1 ? t('editor.palette.addCount', { count }) : t('editor.palette.bestMatches')}>
               {results.map((action) => (
                 <PaletteItem key={action.id} action={action} count={count} onSelect={pick} />
               ))}
@@ -83,15 +84,15 @@ export function ActionPalette({ race, onPick, inputRef, autoFocus, placeholder, 
                   <StickyNoteIcon className="size-3.5" />
                 </span>
                 <span className="truncate">
-                  Add “<span className="font-medium">{query}</span>” as a text step
+                  {rich('editor.palette.addAsText', { query: <span className="font-medium">{query}</span> })}
                 </span>
               </CommandItem>
             </CommandGroup>
-            <CommandEmpty>No match.</CommandEmpty>
+            <CommandEmpty>{t('editor.palette.noMatch')}</CommandEmpty>
           </>
         ) : (
           grouped.map(({ kind, actions }) => (
-            <CommandGroup key={kind} heading={ACTION_KIND_LABELS[kind]}>
+            <CommandGroup key={kind} heading={t(`actionKinds.${kind}`)}>
               <div className="grid grid-cols-1 gap-0.5 sm:grid-cols-2 lg:grid-cols-1">
                 {actions.map((action) => (
                   <PaletteItem key={action.id} action={action} count={1} onSelect={pick} compact />
@@ -103,7 +104,7 @@ export function ActionPalette({ race, onPick, inputRef, autoFocus, placeholder, 
       </CommandList>
       <p className="hidden items-center gap-1.5 border-t px-3 py-2 text-xs text-muted-foreground sm:flex">
         <Kbd>↑</Kbd>
-        <Kbd>↓</Kbd> navigate <Kbd>⏎</Kbd> add · prefix a number to add several
+        <Kbd>↓</Kbd> {t('editor.palette.navigate')} <Kbd>⏎</Kbd> {t('editor.palette.add')} · {t('editor.palette.countHint')}
       </p>
     </Command>
   )

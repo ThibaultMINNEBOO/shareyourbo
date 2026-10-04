@@ -144,7 +144,7 @@ export function PlayMode({ slug, title, race, vsRace, steps }: Props) {
             </div>
             <p className="hidden items-center gap-1.5 text-xs text-muted-foreground sm:flex">
               <Kbd>←</Kbd>
-              <Kbd>→</Kbd> {t('play.hintSteps')} <Kbd>Space</Kbd> {t('play.hintClock')} <Kbd>R</Kbd> {t('play.hintRestart')}
+              <Kbd>→</Kbd> {t('play.hintSteps')} <Kbd>{t('common.keySpace')}</Kbd> {t('play.hintClock')} <Kbd>R</Kbd> {t('play.hintRestart')}
             </p>
           </div>
         </main>
