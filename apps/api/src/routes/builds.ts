@@ -17,6 +17,9 @@ import { author, buildSummaryColumns, toBuildSummary } from "./serializers";
 
 const slugSuffix = customAlphabet("abcdefghijklmnopqrstuvwxyz0123456789", 6);
 
+/** Counter updates must not bump updated_at (its $onUpdate default). */
+const keepUpdatedAt = { updatedAt: sql`${builds.updatedAt}` };
+
 function escapeLike(value: string) {
   return value.replace(/[\\%_]/g, (c) => `\\${c}`);
 }
@@ -109,7 +112,7 @@ export const buildRoutes = new Hono<AppEnv>()
 
     if (!isOwner) {
       c.executionCtx.waitUntil(
-        db.update(builds).set({ views: sql`${builds.views} + 1` }).where(eq(builds.id, row.id)).then(() => {}),
+        db.update(builds).set({ views: sql`${builds.views} + 1`, ...keepUpdatedAt }).where(eq(builds.id, row.id)).then(() => {}),
       );
     }
 
@@ -174,7 +177,7 @@ export const buildRoutes = new Hono<AppEnv>()
     if (inserted.length) {
       await db
         .update(builds)
-        .set({ likesCount: sql`${builds.likesCount} + 1` })
+        .set({ likesCount: sql`${builds.likesCount} + 1`, ...keepUpdatedAt })
         .where(eq(builds.id, buildId));
     }
     return c.json({ liked: true });
@@ -190,7 +193,7 @@ export const buildRoutes = new Hono<AppEnv>()
     if (removed.length) {
       await db
         .update(builds)
-        .set({ likesCount: sql`max(${builds.likesCount} - 1, 0)` })
+        .set({ likesCount: sql`max(${builds.likesCount} - 1, 0)`, ...keepUpdatedAt })
         .where(eq(builds.id, buildId));
     }
     return c.json({ liked: false });

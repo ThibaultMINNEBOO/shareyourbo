@@ -78,6 +78,17 @@ describe("builds API", () => {
     expect(body.likedByMe).toBe(false);
   });
 
+  it("does not touch updatedAt when liking or viewing", async () => {
+    const owner = await signUp();
+    const fan = await signUp();
+    const { id, slug } = await createBuild(owner.cookie);
+    const read = async () => ((await (await request(`/api/builds/${slug}`)).json()) as { build: { updatedAt: string } }).build;
+    const before = (await read()).updatedAt;
+    await new Promise((r) => setTimeout(r, 5));
+    await request(`/api/builds/${id}/like`, { method: "POST", cookie: fan.cookie });
+    expect((await read()).updatedAt).toBe(before);
+  });
+
   it("filters and paginates the public list", async () => {
     const { cookie } = await signUp();
     for (let i = 0; i < 3; i++) await createBuild(cookie, { title: `ZvT roach push ${i}`, race: "Z", vsRace: "T", tags: ["timing"] });
