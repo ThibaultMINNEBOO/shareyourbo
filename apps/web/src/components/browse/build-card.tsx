@@ -4,12 +4,13 @@ import { ActionBadge } from '@/components/build/action-chip'
 import { BuildTags } from '@/components/build/build-tags'
 import { Matchup } from '@/components/build/race'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { compactNumber, timeAgo } from '@/lib/format'
+import { useFormat } from '@/lib/format'
 import type { BuildSummary } from '@/lib/queries'
 import { getAction } from '@sybo/shared'
 
 /** Card with the first steps of the build as an "opener" strip. */
 export function BuildCard({ build, showAuthor = true }: { build: BuildSummary; showAuthor?: boolean }) {
+  const { compactNumber, timeAgo } = useFormat()
   return (
     <Card className="group relative gap-4 transition-colors hover:border-primary/50 hover:bg-card/80">
       <CardHeader className="gap-2">

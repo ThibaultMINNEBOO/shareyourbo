@@ -12,11 +12,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { useI18n } from '@/i18n'
 import { authClient, type SessionUser } from '@/lib/auth-client'
 
 export function UserMenu({ user }: { user: SessionUser }) {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const { t } = useI18n()
   const handle = user.displayUsername ?? user.username ?? user.name
 
   async function signOut() {
@@ -28,7 +30,7 @@ export function UserMenu({ user }: { user: SessionUser }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" aria-label="Account menu">
+        <Button variant="ghost" size="icon" aria-label={t('header.accountMenu')}>
           <Avatar className="size-7">
             <AvatarFallback className="text-xs font-semibold uppercase">{handle.slice(0, 2)}</AvatarFallback>
           </Avatar>
@@ -42,13 +44,13 @@ export function UserMenu({ user }: { user: SessionUser }) {
             <DropdownMenuItem asChild>
               <Link to="/u/$username" params={{ username: user.username }}>
                 <UserIcon />
-                My builds
+                {t('header.myBuilds')}
               </Link>
             </DropdownMenuItem>
           )}
           <DropdownMenuItem onSelect={signOut}>
             <LogOutIcon />
-            Sign out
+            {t('header.signOut')}
           </DropdownMenuItem>
         </DropdownMenuGroup>
       </DropdownMenuContent>

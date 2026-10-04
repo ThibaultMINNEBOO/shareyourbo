@@ -2,13 +2,16 @@ import { Link } from '@tanstack/react-router'
 import { PlusIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+import { useI18n } from '@/i18n'
 import { useSession } from '@/lib/auth-client'
+import { LanguageSwitcher } from './language-switcher'
 import { Logo } from './logo'
 import { ThemeToggle } from './theme-toggle'
 import { UserMenu } from './user-menu'
 
 export function SiteHeader() {
   const session = useSession()
+  const { t } = useI18n()
   const user = session.data?.user
 
   return (
@@ -18,7 +21,7 @@ export function SiteHeader() {
         <nav className="hidden items-center gap-1 text-sm sm:flex">
           <Button variant="ghost" size="sm" asChild>
             <Link to="/" activeOptions={{ exact: true }} activeProps={{ className: 'text-foreground' }} className="text-muted-foreground">
-              Browse
+              {t('header.browse')}
             </Link>
           </Button>
         </nav>
@@ -26,9 +29,10 @@ export function SiteHeader() {
           <Button size="sm" asChild>
             <Link to="/new">
               <PlusIcon data-icon="inline-start" />
-              New build
+              <span className="hidden sm:inline">{t('header.newBuild')}</span>
             </Link>
           </Button>
+          <LanguageSwitcher />
           <ThemeToggle />
           {session.isPending ? (
             <Skeleton className="size-8 rounded-full" />
@@ -36,7 +40,7 @@ export function SiteHeader() {
             <UserMenu user={user} />
           ) : (
             <Button variant="outline" size="sm" asChild>
-              <Link to="/login">Sign in</Link>
+              <Link to="/login">{t('header.signIn')}</Link>
             </Button>
           )}
         </div>

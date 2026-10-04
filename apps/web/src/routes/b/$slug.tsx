@@ -11,7 +11,7 @@ import { NotFound } from '@/components/feedback/not-found'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
-import { formatDate } from '@/lib/format'
+import { useFormat } from '@/lib/format'
 import { buildQuery } from '@/lib/queries'
 
 export const Route = createFileRoute('/b/$slug')({
@@ -27,6 +27,7 @@ function BuildPage() {
   const { slug } = Route.useParams()
   const { data } = useSuspenseQuery(buildQuery(slug))
   const { build } = data
+  const { formatDate } = useFormat()
 
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-8">

@@ -6,7 +6,7 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { api, unwrap } from '@/lib/api'
 import { useSession } from '@/lib/auth-client'
-import { compactNumber } from '@/lib/format'
+import { useFormat } from '@/lib/format'
 import { type BuildDetail, buildQuery } from '@/lib/queries'
 
 export function LikeButton({ slug, data }: { slug: string; data: BuildDetail }) {
@@ -14,6 +14,7 @@ export function LikeButton({ slug, data }: { slug: string; data: BuildDetail }) 
   const navigate = useNavigate()
   const location = useLocation()
   const queryClient = useQueryClient()
+  const { compactNumber } = useFormat()
   const { queryKey } = buildQuery(slug)
   const { likedByMe, build } = data
 

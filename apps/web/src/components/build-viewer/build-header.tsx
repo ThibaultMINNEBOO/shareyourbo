@@ -2,11 +2,12 @@ import { Link } from '@tanstack/react-router'
 import { EyeIcon, HeartIcon, ListOrderedIcon } from 'lucide-react'
 import { BuildTags } from '@/components/build/build-tags'
 import { Matchup } from '@/components/build/race'
-import { compactNumber, timeAgo } from '@/lib/format'
+import { useFormat } from '@/lib/format'
 import type { BuildDetail } from '@/lib/queries'
 
 export function BuildHeader({ build, actions }: { build: BuildDetail['build']; actions?: React.ReactNode }) {
   const stepCount = build.steps.filter((s) => s.kind === 'step').length
+  const { compactNumber, timeAgo } = useFormat()
   return (
     <header className="flex flex-col gap-4">
       <div className="flex flex-wrap items-center gap-3">

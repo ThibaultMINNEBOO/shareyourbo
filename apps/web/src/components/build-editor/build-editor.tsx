@@ -23,7 +23,7 @@ import { Spinner } from '@/components/ui/spinner'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { api, unwrap } from '@/lib/api'
-import { timeAgo } from '@/lib/format'
+import { useFormat } from '@/lib/format'
 import { ActionPalette, type PaletteSelection } from './action-palette'
 import { type EditorDoc, editorReducer, initEditor, newStepId, toBuildInput } from './editor-state'
 import { ImportDialog } from './import-dialog'
@@ -50,6 +50,7 @@ export function BuildEditor({ initialDoc, buildId, heading, draftKey }: Props) {
   const [titleError, setTitleError] = useState<string>()
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const { timeAgo } = useFormat()
 
   const dirty = state.past.length > 0
   const save = useMutation({
