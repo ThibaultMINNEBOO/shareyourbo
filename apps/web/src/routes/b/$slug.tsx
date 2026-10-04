@@ -1,11 +1,13 @@
 import { RACE_NAMES } from '@sybo/shared'
 import { useSuspenseQuery } from '@tanstack/react-query'
-import { createFileRoute } from '@tanstack/react-router'
+import { Link, createFileRoute } from '@tanstack/react-router'
+import { GitForkIcon, PencilIcon } from 'lucide-react'
 import { cn } from 'cn'
 import { BuildHeader } from '@/components/build-viewer/build-header'
 import { CopyActions } from '@/components/build-viewer/copy-actions'
 import { StepList } from '@/components/build-viewer/step-list'
 import { NotFound } from '@/components/feedback/not-found'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { formatDate } from '@/lib/format'
@@ -27,7 +29,28 @@ function BuildPage() {
 
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-8">
-      <BuildHeader build={build} actions={<CopyActions title={build.title} steps={build.steps} />} />
+      <BuildHeader
+        build={build}
+        actions={
+          <>
+            {data.isOwner && (
+              <Button asChild>
+                <Link to="/b/$slug/edit" params={{ slug }}>
+                  <PencilIcon data-icon="inline-start" />
+                  Edit
+                </Link>
+              </Button>
+            )}
+            <CopyActions title={build.title} steps={build.steps} />
+            <Button variant="outline" asChild>
+              <Link to="/new" search={{ fork: slug }}>
+                <GitForkIcon data-icon="inline-start" />
+                Fork
+              </Link>
+            </Button>
+          </>
+        }
+      />
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_18rem]">
         <Card className="py-4">
           <CardContent className="px-2 sm:px-4">

@@ -15,6 +15,7 @@ import { Route as NewRouteImport } from './routes/new'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as BSlugRouteImport } from './routes/b/$slug'
 import { Route as UUsernameRouteImport } from './routes/u/$username'
+import { Route as BSlugEditRouteImport } from './routes/b/$slug_.edit'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -46,6 +47,11 @@ const UUsernameRoute = UUsernameRouteImport.update({
   path: '/u/$username',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BSlugEditRoute = BSlugEditRouteImport.update({
+  id: '/b/$slug_/edit',
+  path: '/b/$slug/edit',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -54,6 +60,7 @@ export interface FileRoutesByFullPath {
   '/signup': typeof SignupRoute
   '/b/$slug': typeof BSlugRoute
   '/u/$username': typeof UUsernameRoute
+  '/b/$slug/edit': typeof BSlugEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -62,6 +69,7 @@ export interface FileRoutesByTo {
   '/signup': typeof SignupRoute
   '/b/$slug': typeof BSlugRoute
   '/u/$username': typeof UUsernameRoute
+  '/b/$slug/edit': typeof BSlugEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -71,12 +79,27 @@ export interface FileRoutesById {
   '/signup': typeof SignupRoute
   '/b/$slug': typeof BSlugRoute
   '/u/$username': typeof UUsernameRoute
+  '/b/$slug_/edit': typeof BSlugEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/new' | '/signup' | '/b/$slug' | '/u/$username'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/new'
+    | '/signup'
+    | '/b/$slug'
+    | '/u/$username'
+    | '/b/$slug/edit'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/new' | '/signup' | '/b/$slug' | '/u/$username'
+  to:
+    | '/'
+    | '/login'
+    | '/new'
+    | '/signup'
+    | '/b/$slug'
+    | '/u/$username'
+    | '/b/$slug/edit'
   id:
     | '__root__'
     | '/'
@@ -85,6 +108,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/b/$slug'
     | '/u/$username'
+    | '/b/$slug_/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -94,6 +118,7 @@ export interface RootRouteChildren {
   SignupRoute: typeof SignupRoute
   BSlugRoute: typeof BSlugRoute
   UUsernameRoute: typeof UUsernameRoute
+  BSlugEditRoute: typeof BSlugEditRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -140,6 +165,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UUsernameRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/b/$slug_/edit': {
+      id: '/b/$slug_/edit'
+      path: '/b/$slug/edit'
+      fullPath: '/b/$slug/edit'
+      preLoaderRoute: typeof BSlugEditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -150,6 +182,7 @@ const rootRouteChildren: RootRouteChildren = {
   SignupRoute: SignupRoute,
   BSlugRoute: BSlugRoute,
   UUsernameRoute: UUsernameRoute,
+  BSlugEditRoute: BSlugEditRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

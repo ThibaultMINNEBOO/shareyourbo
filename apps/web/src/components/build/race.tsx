@@ -1,11 +1,11 @@
 import { type OpponentRace, RACE_NAMES } from '@sybo/shared'
 import { cn } from 'cn'
 
-export const raceClasses: Record<OpponentRace, { solid: string; soft: string; text: string; border: string }> = {
-  T: { solid: 'bg-terran text-terran-foreground', soft: 'bg-terran/15 text-terran', text: 'text-terran', border: 'border-terran/40' },
-  Z: { solid: 'bg-zerg text-zerg-foreground', soft: 'bg-zerg/15 text-zerg', text: 'text-zerg', border: 'border-zerg/40' },
-  P: { solid: 'bg-protoss text-protoss-foreground', soft: 'bg-protoss/15 text-protoss', text: 'text-protoss', border: 'border-protoss/40' },
-  R: { solid: 'bg-random text-random-foreground', soft: 'bg-random/15 text-random', text: 'text-random', border: 'border-random/40' },
+export const raceClasses: Record<OpponentRace, { solid: string; soft: string; text: string; border: string; on: string }> = {
+  T: { solid: 'bg-terran text-terran-foreground', soft: 'bg-terran/15 text-terran', text: 'text-terran', border: 'border-terran/40', on: 'data-[state=on]:bg-terran data-[state=on]:text-terran-foreground' },
+  Z: { solid: 'bg-zerg text-zerg-foreground', soft: 'bg-zerg/15 text-zerg', text: 'text-zerg', border: 'border-zerg/40', on: 'data-[state=on]:bg-zerg data-[state=on]:text-zerg-foreground' },
+  P: { solid: 'bg-protoss text-protoss-foreground', soft: 'bg-protoss/15 text-protoss', text: 'text-protoss', border: 'border-protoss/40', on: 'data-[state=on]:bg-protoss data-[state=on]:text-protoss-foreground' },
+  R: { solid: 'bg-random text-random-foreground', soft: 'bg-random/15 text-random', text: 'text-random', border: 'border-random/40', on: 'data-[state=on]:bg-random data-[state=on]:text-random-foreground' },
 }
 
 export function RaceIcon({ race, className }: { race: OpponentRace; className?: string }) {
