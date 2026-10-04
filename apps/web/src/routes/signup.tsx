@@ -8,7 +8,9 @@ import { Button } from '@/components/ui/button'
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
 import { Spinner } from '@/components/ui/spinner'
+import { useI18n } from '@/i18n'
 import { authClient } from '@/lib/auth-client'
+import { authErrorMessage } from '@/lib/auth-errors'
 import { type FieldErrors, validate } from '@/lib/form'
 
 export const Route = createFileRoute('/signup')({
@@ -22,30 +24,42 @@ function SignUpPage() {
   const [errors, setErrors] = useState<FieldErrors<z.input<typeof signUpSchema>>>({})
   const [formError, setFormError] = useState<string | null>(null)
   const [pending, setPending] = useState(false)
+  const { t, rich } = useI18n()
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     const { data, errors } = validate(signUpSchema, Object.fromEntries(new FormData(e.currentTarget)))
-    setErrors(errors ?? {})
+    setErrors(
+      errors
+        ? {
+            username: errors.username && t('auth.validation.username'),
+            email: errors.email && t('auth.validation.email'),
+            password: errors.password && t('auth.validation.passwordLength'),
+          }
+        : {},
+    )
     setFormError(null)
     if (!data) return
     setPending(true)
     const { error } = await authClient.signUp.email({ ...data, name: data.username })
     setPending(false)
-    if (error) return setFormError(error.message ?? 'Could not create the account')
+    if (error) return setFormError(authErrorMessage(t, error, t('auth.signup.failed')))
     navigate({ to: redirect ?? '/' })
   }
 
   return (
     <AuthCard
-      title="Create an account"
-      description="Share your builds with the community."
+      title={t('auth.signup.title')}
+      description={t('auth.signup.description')}
       footer={
         <span>
-          Already registered?{' '}
-          <Link to="/login" search={{ redirect }} className="font-medium text-primary hover:underline">
-            Sign in
-          </Link>
+          {rich('auth.signup.hasAccount', {
+            link: (
+              <Link to="/login" search={{ redirect }} className="font-medium text-primary hover:underline">
+                {t('auth.signup.signIn')}
+              </Link>
+            ),
+          })}
         </span>
       }
     >
@@ -57,31 +71,31 @@ function SignUpPage() {
             </Alert>
           )}
           <Field data-invalid={!!errors.username || undefined}>
-            <FieldLabel htmlFor="username">Username</FieldLabel>
+            <FieldLabel htmlFor="username">{t('auth.username')}</FieldLabel>
             <Input id="username" name="username" autoComplete="username" autoFocus aria-invalid={!!errors.username} />
             {errors.username ? (
               <FieldError>{errors.username}</FieldError>
             ) : (
-              <FieldDescription>Shown on your builds. Letters, digits and underscores.</FieldDescription>
+              <FieldDescription>{t('auth.signup.usernameHint')}</FieldDescription>
             )}
           </Field>
           <Field data-invalid={!!errors.email || undefined}>
-            <FieldLabel htmlFor="email">Email</FieldLabel>
+            <FieldLabel htmlFor="email">{t('auth.email')}</FieldLabel>
             <Input id="email" name="email" type="email" autoComplete="email" aria-invalid={!!errors.email} />
             <FieldError>{errors.email}</FieldError>
           </Field>
           <Field data-invalid={!!errors.password || undefined}>
-            <FieldLabel htmlFor="password">Password</FieldLabel>
+            <FieldLabel htmlFor="password">{t('auth.password')}</FieldLabel>
             <Input id="password" name="password" type="password" autoComplete="new-password" aria-invalid={!!errors.password} />
             {errors.password ? (
               <FieldError>{errors.password}</FieldError>
             ) : (
-              <FieldDescription>At least 8 characters.</FieldDescription>
+              <FieldDescription>{t('auth.signup.passwordHint')}</FieldDescription>
             )}
           </Field>
           <Button type="submit" disabled={pending} className="w-full">
             {pending && <Spinner data-icon="inline-start" />}
-            Create account
+            {t('auth.signup.submit')}
           </Button>
         </FieldGroup>
       </form>
