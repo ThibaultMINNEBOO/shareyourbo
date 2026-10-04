@@ -91,7 +91,9 @@ t('common.steps', { count: 3 })              // plural, via Intl.PluralRules
 rich('build.by', { author: <Link … /> })     // placeholders replaced by React nodes
 ```
 
-To add a language, add a dictionary typed as `Messages` and list it in `LOCALES` and `LOCALE_NAMES`. The app starts in the language saved in `localStorage`, then the browser language, and falls back to English. Unit names stay in English on purpose: it is how the community writes builds.
+To add a language, add a dictionary typed as `Messages` and list it in `LOCALES` and `LOCALE_NAMES`. The app starts in the language saved in `localStorage`, then the browser language, and falls back to English.
+
+Game names (units, buildings, upgrades) are localized too, using the official French client names from `packages/shared/src/sc2/names-fr.ts`. Search and import accept both languages, so a build written with English names reads in French and vice versa.
 
 ## Deployment
 
