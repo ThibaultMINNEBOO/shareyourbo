@@ -84,8 +84,10 @@ export function StepList({ steps, race, currentIndex, onStepClick, className }: 
                 </span>
               )}
               <span className="flex min-w-0 flex-col gap-0.5 sm:flex-row sm:items-center sm:gap-3">
-                <ActionLabel actionId={step.actionId} label={step.label} count={step.count} />
-                {step.note && <span className="truncate text-xs text-muted-foreground sm:text-sm">{step.note}</span>}
+                <span className="min-w-0 sm:max-w-[70%] sm:shrink-0">
+                  <ActionLabel actionId={step.actionId} label={step.label} count={step.count} />
+                </span>
+                {step.note && <span className="min-w-0 truncate text-xs text-muted-foreground sm:text-sm">{step.note}</span>}
               </span>
             </Row>
           </li>

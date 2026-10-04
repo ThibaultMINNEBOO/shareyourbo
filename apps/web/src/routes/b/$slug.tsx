@@ -1,7 +1,7 @@
 import { RACE_NAMES } from '@sybo/shared'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { Link, createFileRoute } from '@tanstack/react-router'
-import { GitForkIcon, PencilIcon } from 'lucide-react'
+import { GitForkIcon, PencilIcon, PlayIcon } from 'lucide-react'
 import { cn } from 'cn'
 import { BuildHeader } from '@/components/build-viewer/build-header'
 import { CopyActions } from '@/components/build-viewer/copy-actions'
@@ -34,9 +34,15 @@ function BuildPage() {
         build={build}
         actions={
           <>
+            <Button asChild>
+              <Link to="/b/$slug/play" params={{ slug }}>
+                <PlayIcon data-icon="inline-start" />
+                Play mode
+              </Link>
+            </Button>
             <LikeButton slug={slug} data={data} />
             {data.isOwner && (
-              <Button asChild>
+              <Button variant="outline" asChild>
                 <Link to="/b/$slug/edit" params={{ slug }}>
                   <PencilIcon data-icon="inline-start" />
                   Edit

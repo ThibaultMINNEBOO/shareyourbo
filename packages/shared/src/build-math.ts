@@ -94,3 +94,12 @@ export function slugify(title: string) {
     .replace(/-+$/g, "");
   return slug || "build";
 }
+
+/** Index of the last step whose time has been reached, or -1. Untimed steps are skipped. */
+export function lastStepReachedAt(steps: Pick<Step, "time">[], seconds: number) {
+  let reached = -1;
+  steps.forEach((step, i) => {
+    if (step.time !== undefined && step.time <= seconds) reached = i;
+  });
+  return reached;
+}

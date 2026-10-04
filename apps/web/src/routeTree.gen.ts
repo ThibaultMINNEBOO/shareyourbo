@@ -16,6 +16,7 @@ import { Route as SignupRouteImport } from './routes/signup'
 import { Route as BSlugRouteImport } from './routes/b/$slug'
 import { Route as UUsernameRouteImport } from './routes/u/$username'
 import { Route as BSlugEditRouteImport } from './routes/b/$slug_.edit'
+import { Route as BSlugPlayRouteImport } from './routes/b/$slug_.play'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -52,6 +53,11 @@ const BSlugEditRoute = BSlugEditRouteImport.update({
   path: '/b/$slug/edit',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BSlugPlayRoute = BSlugPlayRouteImport.update({
+  id: '/b/$slug_/play',
+  path: '/b/$slug/play',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -61,6 +67,7 @@ export interface FileRoutesByFullPath {
   '/b/$slug': typeof BSlugRoute
   '/u/$username': typeof UUsernameRoute
   '/b/$slug/edit': typeof BSlugEditRoute
+  '/b/$slug/play': typeof BSlugPlayRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -70,6 +77,7 @@ export interface FileRoutesByTo {
   '/b/$slug': typeof BSlugRoute
   '/u/$username': typeof UUsernameRoute
   '/b/$slug/edit': typeof BSlugEditRoute
+  '/b/$slug/play': typeof BSlugPlayRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -80,6 +88,7 @@ export interface FileRoutesById {
   '/b/$slug': typeof BSlugRoute
   '/u/$username': typeof UUsernameRoute
   '/b/$slug_/edit': typeof BSlugEditRoute
+  '/b/$slug_/play': typeof BSlugPlayRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -91,6 +100,7 @@ export interface FileRouteTypes {
     | '/b/$slug'
     | '/u/$username'
     | '/b/$slug/edit'
+    | '/b/$slug/play'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -100,6 +110,7 @@ export interface FileRouteTypes {
     | '/b/$slug'
     | '/u/$username'
     | '/b/$slug/edit'
+    | '/b/$slug/play'
   id:
     | '__root__'
     | '/'
@@ -109,6 +120,7 @@ export interface FileRouteTypes {
     | '/b/$slug'
     | '/u/$username'
     | '/b/$slug_/edit'
+    | '/b/$slug_/play'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -119,6 +131,7 @@ export interface RootRouteChildren {
   BSlugRoute: typeof BSlugRoute
   UUsernameRoute: typeof UUsernameRoute
   BSlugEditRoute: typeof BSlugEditRoute
+  BSlugPlayRoute: typeof BSlugPlayRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -172,6 +185,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BSlugEditRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/b/$slug_/play': {
+      id: '/b/$slug_/play'
+      path: '/b/$slug/play'
+      fullPath: '/b/$slug/play'
+      preLoaderRoute: typeof BSlugPlayRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -183,6 +203,7 @@ const rootRouteChildren: RootRouteChildren = {
   BSlugRoute: BSlugRoute,
   UUsernameRoute: UUsernameRoute,
   BSlugEditRoute: BSlugEditRoute,
+  BSlugPlayRoute: BSlugPlayRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

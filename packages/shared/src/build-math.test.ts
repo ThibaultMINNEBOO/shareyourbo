@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { computeSupply, formatTime, parseTime, slugify, stepsToText } from "./build-math";
+import { computeSupply, formatTime, lastStepReachedAt, parseTime, slugify, stepsToText } from "./build-math";
 import type { Step } from "./schemas";
 
 let n = 0;
@@ -107,5 +107,19 @@ describe("slugify", () => {
     expect(slugify("PvZ — 2 Base Blink!")).toBe("pvz-2-base-blink");
     expect(slugify("   ")).toBe("build");
     expect(slugify("a".repeat(100)).length).toBeLessThanOrEqual(60);
+  });
+});
+
+describe("lastStepReachedAt", () => {
+  const steps = [{ time: 0 }, {}, { time: 18 }, {}, { time: 40 }];
+
+  it("returns the last timed step already reached", () => {
+    expect(lastStepReachedAt(steps, 0)).toBe(0);
+    expect(lastStepReachedAt(steps, 20)).toBe(2);
+    expect(lastStepReachedAt(steps, 99)).toBe(4);
+  });
+
+  it("returns -1 before the first timed step", () => {
+    expect(lastStepReachedAt([{}, { time: 10 }], 5)).toBe(-1);
   });
 });
