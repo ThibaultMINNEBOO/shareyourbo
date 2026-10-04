@@ -5,6 +5,7 @@ import { GitForkIcon, PencilIcon } from 'lucide-react'
 import { cn } from 'cn'
 import { BuildHeader } from '@/components/build-viewer/build-header'
 import { CopyActions } from '@/components/build-viewer/copy-actions'
+import { LikeButton } from '@/components/build-viewer/like-button'
 import { StepList } from '@/components/build-viewer/step-list'
 import { NotFound } from '@/components/feedback/not-found'
 import { Button } from '@/components/ui/button'
@@ -33,6 +34,7 @@ function BuildPage() {
         build={build}
         actions={
           <>
+            <LikeButton slug={slug} data={data} />
             {data.isOwner && (
               <Button asChild>
                 <Link to="/b/$slug/edit" params={{ slug }}>
