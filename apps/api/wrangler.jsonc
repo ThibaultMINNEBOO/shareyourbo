@@ -7,5 +7,13 @@
   "observability": { "enabled": true },
   "vars": {
     "WEB_ORIGIN": "http://localhost:5173"
-  }
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "shareyourbo",
+      // Omitted id: wrangler provisions the database on first deploy.
+      "migrations_dir": "migrations"
+    }
+  ]
 }
