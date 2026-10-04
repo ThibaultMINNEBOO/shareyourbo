@@ -1,4 +1,4 @@
-import { RACE_NAMES, type Race, buildInputSchema, getAction } from '@sybo/shared'
+import { RACE_NAMES, type Race, type Step, buildInputSchema, getAction } from '@sybo/shared'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useBlocker, useNavigate } from '@tanstack/react-router'
 import { EyeIcon, HeadingIcon, HistoryIcon, ListPlusIcon, PlusIcon, Redo2Icon, SaveIcon, Undo2Icon } from 'lucide-react'
@@ -25,7 +25,8 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { api, unwrap } from '@/lib/api'
 import { timeAgo } from '@/lib/format'
 import { ActionPalette, type PaletteSelection } from './action-palette'
-import { type EditorDoc, editorReducer, initEditor, toBuildInput } from './editor-state'
+import { type EditorDoc, editorReducer, initEditor, newStepId, toBuildInput } from './editor-state'
+import { ImportDialog } from './import-dialog'
 import { MetaForm } from './meta-form'
 import { StepTable } from './step-table'
 import { clearDraft, useDraft } from './use-draft'
@@ -201,7 +202,23 @@ export function BuildEditor({ initialDoc, buildId, heading, draftKey }: Props) {
           <div className="flex items-center gap-2">
             <h2 className="font-heading text-base font-semibold">Steps</h2>
             <span className="text-sm text-muted-foreground">{doc.steps.filter((s) => s.kind === 'step').length}</span>
-            <Button variant="outline" size="sm" className="ml-auto" onClick={addSection}>
+            <div className="ml-auto" />
+            <ImportDialog
+              race={doc.meta.race}
+              hasSteps={doc.steps.length > 0}
+              onImport={(steps, race) => {
+                if (race) {
+                  dispatch({
+                    type: 'set',
+                    doc: { meta: { ...doc.meta, race }, steps: steps.map((s) => ({ ...s, id: newStepId() }) as Step) },
+                  })
+                } else {
+                  dispatch({ type: 'insert', at: doc.steps.length, steps })
+                }
+                toast.success(`Imported ${steps.length} step${steps.length === 1 ? '' : 's'}`)
+              }}
+            />
+            <Button variant="outline" size="sm" onClick={addSection}>
               <HeadingIcon data-icon="inline-start" />
               Section
             </Button>
