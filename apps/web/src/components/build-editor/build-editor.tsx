@@ -1,10 +1,11 @@
 import { RACE_NAMES, type Race, buildInputSchema, getAction } from '@sybo/shared'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useBlocker, useNavigate } from '@tanstack/react-router'
-import { EyeIcon, HeadingIcon, ListPlusIcon, PlusIcon, Redo2Icon, SaveIcon, Undo2Icon } from 'lucide-react'
+import { EyeIcon, HeadingIcon, HistoryIcon, ListPlusIcon, PlusIcon, Redo2Icon, SaveIcon, Undo2Icon } from 'lucide-react'
 import { useReducer, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { StepList } from '@/components/build-viewer/step-list'
+import { Alert, AlertAction, AlertDescription, AlertTitle } from '@/components/ui/alert'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -22,19 +23,24 @@ import { Spinner } from '@/components/ui/spinner'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { api, unwrap } from '@/lib/api'
+import { timeAgo } from '@/lib/format'
 import { ActionPalette, type PaletteSelection } from './action-palette'
 import { type EditorDoc, editorReducer, initEditor, toBuildInput } from './editor-state'
 import { MetaForm } from './meta-form'
 import { StepTable } from './step-table'
+import { clearDraft, useDraft } from './use-draft'
+import { useEditorShortcuts } from './use-editor-shortcuts'
 
 type Props = {
   initialDoc: EditorDoc
   /** Present when editing an existing build. */
   buildId?: string
   heading: string
+  /** localStorage key for the unsaved draft of this editor session. */
+  draftKey: string
 }
 
-export function BuildEditor({ initialDoc, buildId, heading }: Props) {
+export function BuildEditor({ initialDoc, buildId, heading, draftKey }: Props) {
   const [state, dispatch] = useReducer(editorReducer, initialDoc, initEditor)
   const { doc, selected } = state
   const paletteInput = useRef<HTMLInputElement>(null)
@@ -51,6 +57,7 @@ export function BuildEditor({ initialDoc, buildId, heading }: Props) {
         ? unwrap(api.builds[':id'].$patch({ param: { id: buildId }, json: input }))
         : unwrap(api.builds.$post({ json: input })),
     onSuccess: async ({ slug }) => {
+      clearDraft(draftKey)
       await queryClient.invalidateQueries({ queryKey: ['builds'] })
       await queryClient.invalidateQueries({ queryKey: ['build', slug] })
       toast.success(buildId ? 'Build updated' : 'Build published')
@@ -58,6 +65,16 @@ export function BuildEditor({ initialDoc, buildId, heading }: Props) {
     },
     onError: (error) => toast.error(error.message),
   })
+
+  const draft = useDraft(draftKey, doc, dirty)
+
+  function focusPalette() {
+    const input = paletteInput.current
+    if (input && input.offsetParent !== null) input.focus()
+    else setPaletteSheetOpen(true)
+  }
+
+  useEditorShortcuts(state, dispatch, focusPalette)
 
   useBlocker({
     shouldBlockFn: () => dirty && !save.isSuccess && !window.confirm('Leave the editor? Unsaved changes will be lost.'),
@@ -144,6 +161,30 @@ export function BuildEditor({ initialDoc, buildId, heading }: Props) {
           </Button>
         </div>
       </div>
+
+      {draft.draft && (
+        <Alert>
+          <HistoryIcon />
+          <AlertTitle>Unsaved draft found</AlertTitle>
+          <AlertDescription>
+            You have changes from {timeAgo(new Date(draft.draft.savedAt))} that were never saved.
+          </AlertDescription>
+          <AlertAction className="flex gap-2">
+            <Button size="sm" variant="ghost" onClick={draft.dismiss}>
+              Discard
+            </Button>
+            <Button
+              size="sm"
+              onClick={() => {
+                dispatch({ type: 'set', doc: draft.draft!.doc })
+                draft.consume()
+              }}
+            >
+              Restore
+            </Button>
+          </AlertAction>
+        </Alert>
+      )}
 
       <MetaForm
         meta={doc.meta}

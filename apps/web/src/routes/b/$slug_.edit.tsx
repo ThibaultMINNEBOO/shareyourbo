@@ -31,5 +31,5 @@ export const Route = createFileRoute('/b/$slug_/edit')({
 
 function EditBuildPage() {
   const { id, doc } = Route.useLoaderData()
-  return <BuildEditor key={id} initialDoc={doc} buildId={id} heading="Edit build" />
+  return <BuildEditor key={id} initialDoc={doc} buildId={id} heading="Edit build" draftKey={id} />
 }

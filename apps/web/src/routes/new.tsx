@@ -31,5 +31,10 @@ export const Route = createFileRoute('/new')({
 function NewBuildPage() {
   const doc = Route.useLoaderData()
   const { fork } = Route.useSearch()
-  return <BuildEditor key={fork ?? 'new'} initialDoc={doc} heading={fork ? 'Fork build' : 'New build'} />
+  return <BuildEditor
+      key={fork ?? 'new'}
+      initialDoc={doc}
+      heading={fork ? 'Fork build' : 'New build'}
+      draftKey={fork ? `fork:${fork}` : 'new'}
+    />
 }

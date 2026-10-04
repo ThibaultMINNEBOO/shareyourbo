@@ -90,7 +90,8 @@ export function editorReducer(state: EditorState, action: EditorAction): EditorS
     case 'remove': {
       if (!steps[action.index]) return state
       const next = steps.filter((_, i) => i !== action.index)
-      return withSteps(state, next, action.index <= state.selected ? state.selected - 1 : state.selected)
+      // Deleting the selected step selects the one that takes its place.
+      return withSteps(state, next, action.index < state.selected ? state.selected - 1 : state.selected)
     }
     case 'duplicate': {
       const current = steps[action.index]
