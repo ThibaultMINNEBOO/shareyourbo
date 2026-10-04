@@ -7,6 +7,7 @@ Create, share and play StarCraft II build orders.
 - **Play mode**: full-screen, one step at a time, with a game clock that follows timed steps — made for a second screen
 - **Editor**: keyboard-first (`/` then `2 probe` ⏎ `pylon` ⏎ …), supply computed automatically, drag & drop, undo/redo, autosaved drafts
 - **Import** builds pasted from Spawning Tool, Liquipedia or a notepad; **fork** any build
+- **English / French** interface, switchable at any time from the header
 
 ## Stack
 
@@ -78,6 +79,19 @@ packages/shared/src
   build-math.ts       supply suggestions, time parsing, text export
   import-text.ts      pasted-build parser
 ```
+
+## Translations
+
+UI strings live in `apps/web/src/i18n`: `en.ts` is the source dictionary and `fr.ts` must have exactly the same keys (TypeScript enforces it, and a test checks it too).
+
+```tsx
+const { t, rich } = useI18n()
+t('editor.publish')                          // plain string
+t('common.steps', { count: 3 })              // plural, via Intl.PluralRules
+rich('build.by', { author: <Link … /> })     // placeholders replaced by React nodes
+```
+
+To add a language, add a dictionary typed as `Messages` and list it in `LOCALES` and `LOCALE_NAMES`. The app starts in the language saved in `localStorage`, then the browser language, and falls back to English. Unit names stay in English on purpose: it is how the community writes builds.
 
 ## Deployment
 
