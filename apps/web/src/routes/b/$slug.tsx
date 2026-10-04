@@ -1,0 +1,80 @@
+import { RACE_NAMES } from '@sybo/shared'
+import { useSuspenseQuery } from '@tanstack/react-query'
+import { createFileRoute } from '@tanstack/react-router'
+import { cn } from 'cn'
+import { BuildHeader } from '@/components/build-viewer/build-header'
+import { CopyActions } from '@/components/build-viewer/copy-actions'
+import { StepList } from '@/components/build-viewer/step-list'
+import { NotFound } from '@/components/feedback/not-found'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Separator } from '@/components/ui/separator'
+import { formatDate } from '@/lib/format'
+import { buildQuery } from '@/lib/queries'
+
+export const Route = createFileRoute('/b/$slug')({
+  loader: ({ context, params }) => context.queryClient.ensureQueryData(buildQuery(params.slug)),
+  head: ({ loaderData }) => ({ meta: [{ title: loaderData ? `${loaderData.build.title} — ShareYourBO` : 'ShareYourBO' }] }),
+  component: BuildPage,
+  errorComponent: () => (
+    <NotFound title="Build not found" description="It may have been deleted or made private." />
+  ),
+})
+
+function BuildPage() {
+  const { slug } = Route.useParams()
+  const { data } = useSuspenseQuery(buildQuery(slug))
+  const { build } = data
+
+  return (
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-8">
+      <BuildHeader build={build} actions={<CopyActions title={build.title} steps={build.steps} />} />
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_18rem]">
+        <Card className="py-4">
+          <CardContent className="px-2 sm:px-4">
+            <StepList steps={build.steps} race={build.race} />
+          </CardContent>
+        </Card>
+        <aside className="flex flex-col gap-4">
+          {build.description && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="font-heading">About this build</CardTitle>
+              </CardHeader>
+              <CardContent className="text-sm leading-relaxed whitespace-pre-line text-muted-foreground">
+                {build.description}
+              </CardContent>
+            </Card>
+          )}
+          <Card>
+            <CardContent className="flex flex-col gap-3 text-sm">
+              <Detail label="Matchup" value={`${RACE_NAMES[build.race]} vs ${RACE_NAMES[build.vsRace]}`} />
+              <Separator />
+              {build.patch && (
+                <>
+                  <Detail label="Patch" value={build.patch} />
+                  <Separator />
+                </>
+              )}
+              <Detail label="Created" value={formatDate(build.createdAt)} />
+              {build.visibility !== 'public' && (
+                <>
+                  <Separator />
+                  <Detail label="Visibility" value={build.visibility} capitalize />
+                </>
+              )}
+            </CardContent>
+          </Card>
+        </aside>
+      </div>
+    </div>
+  )
+}
+
+function Detail({ label, value, capitalize }: { label: string; value: string; capitalize?: boolean }) {
+  return (
+    <div className="flex items-center justify-between gap-4">
+      <span className="text-muted-foreground">{label}</span>
+      <span className={cn('font-medium', capitalize && 'capitalize')}>{value}</span>
+    </div>
+  )
+}
