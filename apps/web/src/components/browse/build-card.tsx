@@ -6,6 +6,7 @@ import { Matchup } from '@/components/build/race'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { useI18n } from '@/i18n'
 import { useFormat } from '@/lib/format'
+import { useActionNames } from '@/lib/game-names'
 import type { BuildSummary } from '@/lib/queries'
 import { getAction } from '@sybo/shared'
 
@@ -13,6 +14,7 @@ import { getAction } from '@sybo/shared'
 export function BuildCard({ build, showAuthor = true }: { build: BuildSummary; showAuthor?: boolean }) {
   const { compactNumber, timeAgo } = useFormat()
   const { t } = useI18n()
+  const names = useActionNames()
   return (
     <Card className="group relative gap-4 transition-colors hover:border-primary/50 hover:bg-card/80">
       <CardHeader className="gap-2">
@@ -42,9 +44,9 @@ export function BuildCard({ build, showAuthor = true }: { build: BuildSummary; s
           {build.preview.map((step) => {
             const action = getAction(step.actionId)
             return (
-              <li key={step.id} title={action?.name ?? step.label}>
+              <li key={step.id} title={action ? names.name(action) : step.label}>
                 {action ? (
-                  <ActionBadge short={action.short} race={action.race} />
+                  <ActionBadge action={action} />
                 ) : (
                   <span className="inline-flex h-6 max-w-28 items-center truncate rounded border border-dashed px-1.5 text-xs text-muted-foreground">
                     {step.label}

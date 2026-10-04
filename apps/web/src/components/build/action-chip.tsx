@@ -1,7 +1,8 @@
-import { type ActionKind, type Race, getAction } from '@sybo/shared'
+import { type ActionKind, type GameAction, getAction } from '@sybo/shared'
 import { cn } from 'cn'
 import { ArrowUpCircleIcon, Building2Icon, type LucideIcon, SwordsIcon, ZapIcon } from 'lucide-react'
 import { useI18n } from '@/i18n'
+import { useActionNames } from '@/lib/game-names'
 import { raceClasses } from './race'
 
 export const kindIcons: Record<ActionKind, LucideIcon> = {
@@ -12,7 +13,9 @@ export const kindIcons: Record<ActionKind, LucideIcon> = {
 }
 
 /** Compact square badge with the action's short label, tinted by race. */
-export function ActionBadge({ short, race, className }: { short: string; race: Race; className?: string }) {
+export function ActionBadge({ action, className }: { action: GameAction; className?: string }) {
+  const { short } = useActionNames()
+  const { race } = action
   return (
     <span
       className={cn(
@@ -23,7 +26,7 @@ export function ActionBadge({ short, race, className }: { short: string; race: R
       )}
       aria-hidden="true"
     >
-      {short}
+      {short(action)}
     </span>
   )
 }
@@ -42,6 +45,7 @@ export function ActionLabel({
 }) {
   const action = getAction(actionId)
   const { t } = useI18n()
+  const names = useActionNames()
   const countText = count > 1 && <span className="font-mono text-muted-foreground">×{count}</span>
   if (!action) {
     return (
@@ -56,8 +60,8 @@ export function ActionLabel({
   }
   return (
     <span className={cn('flex min-w-0 items-center gap-2', size === 'lg' && 'gap-3 text-2xl font-semibold')}>
-      <ActionBadge short={action.short} race={action.race} className={cn(size === 'lg' && 'h-9 min-w-14 text-sm')} />
-      <span className="truncate font-medium">{action.name}</span>
+      <ActionBadge action={action} className={cn(size === 'lg' && 'h-9 min-w-14 text-sm')} />
+      <span className="truncate font-medium">{names.name(action)}</span>
       {countText}
     </span>
   )

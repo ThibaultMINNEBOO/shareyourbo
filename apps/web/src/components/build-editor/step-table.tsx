@@ -75,7 +75,8 @@ export function StepTable({ steps, race, selected, dispatch }: Props) {
               slash: <Kbd>/</Kbd>,
               example: (
                 <>
-                  <span className="font-mono">2 probe</span> <Kbd>⏎</Kbd> <span className="font-mono">pylon</span>{' '}
+                  <span className="font-mono">{t('editor.table.exampleFirst')}</span> <Kbd>⏎</Kbd>{' '}
+                  <span className="font-mono">{t('editor.table.exampleSecond')}</span>{' '}
                   <Kbd>⏎</Kbd>
                 </>
               ),

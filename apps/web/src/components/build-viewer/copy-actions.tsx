@@ -14,7 +14,7 @@ async function copy(text: string, message: string, errorMessage: string) {
 }
 
 export function CopyActions({ title, steps }: { title: string; steps: Step[] }) {
-  const { t } = useI18n()
+  const { t, locale } = useI18n()
   const error = t('common.clipboardError')
   return (
     <>
@@ -22,7 +22,7 @@ export function CopyActions({ title, steps }: { title: string; steps: Step[] }) 
         <LinkIcon data-icon="inline-start" />
         {t('build.copyLink')}
       </Button>
-      <Button variant="outline" onClick={() => copy(`${title}\n\n${stepsToText(steps)}`, t('build.textCopied'), error)}>
+      <Button variant="outline" onClick={() => copy(`${title}\n\n${stepsToText(steps, locale)}`, t('build.textCopied'), error)}>
         <ClipboardCopyIcon data-icon="inline-start" />
         {t('build.copyText')}
       </Button>

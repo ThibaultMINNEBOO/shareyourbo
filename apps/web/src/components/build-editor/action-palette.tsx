@@ -12,6 +12,7 @@ import { ActionBadge } from '@/components/build/action-chip'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
 import { Kbd } from '@/components/ui/kbd'
 import { useI18n } from '@/i18n'
+import { useActionNames } from '@/lib/game-names'
 import { parseQuickEntry } from './editor-state'
 
 export type PaletteSelection = { actionId?: string; label?: string; count: number }
@@ -121,10 +122,11 @@ function PaletteItem({
   onSelect: (value: string) => void
   compact?: boolean
 }) {
+  const { name } = useActionNames()
   return (
     <CommandItem value={action.id} onSelect={onSelect} className="gap-3">
-      <ActionBadge short={action.short} race={action.race} />
-      <span className="truncate">{action.name}</span>
+      <ActionBadge action={action} />
+      <span className="truncate">{name(action)}</span>
       {!compact && count > 1 && <span className="font-mono text-muted-foreground">×{count}</span>}
       {!compact && (action.minerals > 0 || action.gas > 0) && (
         <span className="ml-auto shrink-0 font-mono text-xs text-muted-foreground tabular-nums">

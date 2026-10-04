@@ -16,11 +16,6 @@ import { Field, FieldDescription, FieldLabel } from '@/components/ui/field'
 import { Textarea } from '@/components/ui/textarea'
 import { useI18n } from '@/i18n'
 
-const PLACEHOLDER = `13  0:12  Overlord
-16  0:48  Hatchery
-18  1:01  Extractor
-17  1:08  Spawning Pool`
-
 type Props = {
   race: Race
   hasSteps: boolean
@@ -64,7 +59,7 @@ export function ImportDialog({ race, hasSteps, onImport }: Props) {
             id="import-text"
             value={text}
             onChange={(e) => setText(e.target.value)}
-            placeholder={PLACEHOLDER}
+            placeholder={t('editor.import.placeholder')}
             rows={10}
             className="font-mono text-sm"
             autoFocus
