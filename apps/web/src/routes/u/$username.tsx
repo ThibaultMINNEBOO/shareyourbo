@@ -6,13 +6,14 @@ import { NotFound } from '@/components/feedback/not-found'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
+import { useI18n } from '@/i18n'
 import { useFormat } from '@/lib/format'
 import { userQuery } from '@/lib/queries'
 
 export const Route = createFileRoute('/u/$username')({
   loader: ({ context, params }) => context.queryClient.ensureQueryData(userQuery(params.username)),
   component: ProfilePage,
-  errorComponent: () => <NotFound title="Player not found" />,
+  errorComponent: () => <NotFound titleKey="profile.notFound" />,
 })
 
 function ProfilePage() {
@@ -20,6 +21,7 @@ function ProfilePage() {
   const { data } = useSuspenseQuery(userQuery(username))
   const { user, builds, isSelf } = data
   const { formatDate } = useFormat()
+  const { t } = useI18n()
 
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-10">
@@ -30,14 +32,14 @@ function ProfilePage() {
         <div className="flex flex-col gap-1">
           <h1 className="font-heading text-3xl font-bold tracking-tight">{user.displayUsername}</h1>
           <p className="text-sm text-muted-foreground">
-            {builds.length} build{builds.length === 1 ? '' : 's'} · joined {formatDate(user.createdAt)}
+            {t('profile.summary', { count: builds.length, date: formatDate(user.createdAt) })}
           </p>
         </div>
         {isSelf && (
           <Button className="ml-auto" asChild>
             <Link to="/new">
               <PlusIcon data-icon="inline-start" />
-              New build
+              {t('header.newBuild')}
             </Link>
           </Button>
         )}
@@ -55,15 +57,15 @@ function ProfilePage() {
             <EmptyMedia variant="icon">
               <ScrollTextIcon />
             </EmptyMedia>
-            <EmptyTitle>No builds yet</EmptyTitle>
+            <EmptyTitle>{t('profile.emptyTitle')}</EmptyTitle>
             <EmptyDescription>
-              {isSelf ? 'Your published builds will show up here.' : `${user.displayUsername} hasn't shared a build yet.`}
+              {isSelf ? t('profile.emptySelf') : t('profile.emptyOther', { name: user.displayUsername })}
             </EmptyDescription>
           </EmptyHeader>
           {isSelf && (
             <EmptyContent>
               <Button asChild>
-                <Link to="/new">Create your first build</Link>
+                <Link to="/new">{t('profile.createFirst')}</Link>
               </Button>
             </EmptyContent>
           )}

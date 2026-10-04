@@ -26,7 +26,7 @@ export const Route = createFileRoute('/b/$slug_/edit')({
     return { id: build.id, doc }
   },
   component: EditBuildPage,
-  errorComponent: () => <NotFound title="Build not found" />,
+  errorComponent: () => <NotFound titleKey="build.notFound" />,
 })
 
 function EditBuildPage() {

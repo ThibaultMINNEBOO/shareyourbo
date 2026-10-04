@@ -1,4 +1,4 @@
-import { BUILD_TAGS, type BuildTag, OPPONENT_RACES, type OpponentRace, RACES, RACE_NAMES, type Race } from '@sybo/shared'
+import { BUILD_TAGS, type BuildTag, OPPONENT_RACES, type OpponentRace, RACES, type Race } from '@sybo/shared'
 import { cn } from 'cn'
 import { SearchIcon, XIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button'
 import { InputGroup, InputGroupAddon, InputGroupButton, InputGroupInput } from '@/components/ui/input-group'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
+import { useI18n } from '@/i18n'
 
 export type BrowseFilters = {
   race?: Race
@@ -31,6 +32,7 @@ function RaceFilter<R extends OpponentRace>({
   value?: R
   onChange: (race: R | undefined) => void
 }) {
+  const { t } = useI18n()
   return (
     <div className="flex items-center gap-2">
       <span className="text-sm text-muted-foreground">{label}</span>
@@ -44,14 +46,14 @@ function RaceFilter<R extends OpponentRace>({
         aria-label={label}
       >
         <ToggleGroupItem value={ALL} className="px-2.5">
-          All
+          {t('filters.all')}
         </ToggleGroupItem>
         {races.map((race) => (
           <ToggleGroupItem
             key={race}
             value={race}
-            aria-label={RACE_NAMES[race]}
-            title={RACE_NAMES[race]}
+            aria-label={t(`races.${race}`)}
+            title={t(`races.${race}`)}
             className={cn('w-8 font-heading font-bold', raceClasses[race].on)}
           >
             {race}
@@ -64,6 +66,7 @@ function RaceFilter<R extends OpponentRace>({
 
 export function BuildFilters({ filters, onChange }: Props) {
   const [query, setQuery] = useState(filters.q ?? '')
+  const { t } = useI18n()
 
   useEffect(() => {
     if ((filters.q ?? '') === query) return
@@ -83,28 +86,28 @@ export function BuildFilters({ filters, onChange }: Props) {
           <InputGroupInput
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search builds…"
-            aria-label="Search builds"
+            placeholder={t('filters.search')}
+            aria-label={t('filters.search')}
             type="search"
           />
           {query && (
             <InputGroupAddon align="inline-end">
-              <InputGroupButton size="icon-xs" aria-label="Clear search" onClick={() => setQuery('')}>
+              <InputGroupButton size="icon-xs" aria-label={t('filters.clearSearch')} onClick={() => setQuery('')}>
                 <XIcon />
               </InputGroupButton>
             </InputGroupAddon>
           )}
         </InputGroup>
         <Select value={filters.tag ?? ALL} onValueChange={(v) => onChange({ tag: v === ALL ? undefined : (v as BuildTag) })}>
-          <SelectTrigger className="w-36 capitalize" aria-label="Tag">
+          <SelectTrigger className="w-40" aria-label={t('filters.style')}>
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
-              <SelectItem value={ALL}>All styles</SelectItem>
+              <SelectItem value={ALL}>{t('filters.allStyles')}</SelectItem>
               {BUILD_TAGS.map((tag) => (
-                <SelectItem key={tag} value={tag} className="capitalize">
-                  {tag}
+                <SelectItem key={tag} value={tag}>
+                  {t(`tags.${tag}`)}
                 </SelectItem>
               ))}
             </SelectGroup>
@@ -116,20 +119,20 @@ export function BuildFilters({ filters, onChange }: Props) {
           spacing={0}
           value={filters.sort}
           onValueChange={(v) => v && onChange({ sort: v as BrowseFilters['sort'] })}
-          aria-label="Sort"
+          aria-label={t('filters.sort')}
           className="ml-auto"
         >
           <ToggleGroupItem value="new" className="px-3">
-            Newest
+            {t('filters.newest')}
           </ToggleGroupItem>
           <ToggleGroupItem value="top" className="px-3">
-            Most liked
+            {t('filters.mostLiked')}
           </ToggleGroupItem>
         </ToggleGroup>
       </div>
       <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
-        <RaceFilter label="Race" races={RACES} value={filters.race} onChange={(race) => onChange({ race })} />
-        <RaceFilter label="vs" races={OPPONENT_RACES} value={filters.vs} onChange={(vs) => onChange({ vs })} />
+        <RaceFilter label={t('filters.race')} races={RACES} value={filters.race} onChange={(race) => onChange({ race })} />
+        <RaceFilter label={t('filters.vs')} races={OPPONENT_RACES} value={filters.vs} onChange={(vs) => onChange({ vs })} />
         {hasFilters && (
           <Button
             variant="ghost"
@@ -140,7 +143,7 @@ export function BuildFilters({ filters, onChange }: Props) {
             }}
           >
             <XIcon data-icon="inline-start" />
-            Clear filters
+            {t('filters.clear')}
           </Button>
         )}
       </div>

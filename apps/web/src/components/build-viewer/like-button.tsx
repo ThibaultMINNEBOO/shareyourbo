@@ -6,6 +6,7 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { api, unwrap } from '@/lib/api'
 import { useSession } from '@/lib/auth-client'
+import { useI18n } from '@/i18n'
 import { useFormat } from '@/lib/format'
 import { type BuildDetail, buildQuery } from '@/lib/queries'
 
@@ -15,6 +16,7 @@ export function LikeButton({ slug, data }: { slug: string; data: BuildDetail }) 
   const location = useLocation()
   const queryClient = useQueryClient()
   const { compactNumber } = useFormat()
+  const { t } = useI18n()
   const { queryKey } = buildQuery(slug)
   const { likedByMe, build } = data
 
@@ -55,7 +57,7 @@ export function LikeButton({ slug, data }: { slug: string; data: BuildDetail }) 
       variant={likedByMe ? 'secondary' : 'outline'}
       onClick={onClick}
       aria-pressed={likedByMe}
-      aria-label={likedByMe ? 'Unlike this build' : 'Like this build'}
+      aria-label={likedByMe ? t('build.unlike') : t('build.like')}
     >
       <HeartIcon data-icon="inline-start" className={cn(likedByMe && 'fill-current text-zerg')} />
       {compactNumber(build.likesCount)}

@@ -19,3 +19,6 @@ type PluralPaths<T> = {
 }[keyof T & string]
 
 export type PluralKey = PluralPaths<Messages>
+
+/** Keys with a plain string value. */
+export type TextKey = Exclude<MessageKey, PluralKey>

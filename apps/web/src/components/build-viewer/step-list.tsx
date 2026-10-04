@@ -3,6 +3,7 @@ import { cn } from 'cn'
 import { ChevronDownIcon } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { ActionLabel } from '@/components/build/action-chip'
+import { useI18n } from '@/i18n'
 
 type Props = {
   steps: Step[]
@@ -16,6 +17,7 @@ type Props = {
 /** Read-only build order: sections, supply, time, action and note per row. */
 export function StepList({ steps, race, currentIndex, onStepClick, className }: Props) {
   const supplies = useMemo(() => computeSupply(race, steps), [race, steps])
+  const { t } = useI18n()
   const [collapsed, setCollapsed] = useState<Set<string>>(() => new Set())
   const hasTimes = steps.some((s) => s.time !== undefined)
 
@@ -30,7 +32,7 @@ export function StepList({ steps, race, currentIndex, onStepClick, className }: 
   let hiddenBy: string | null = null
 
   return (
-    <ol className={cn('flex flex-col', className)} aria-label="Build order steps">
+    <ol className={cn('flex flex-col', className)} aria-label={t('build.stepsLabel')}>
       {steps.map((step, i) => {
         if (step.kind === 'section') {
           hiddenBy = collapsed.has(step.id) ? step.id : null
@@ -74,7 +76,7 @@ export function StepList({ steps, race, currentIndex, onStepClick, className }: 
                   'text-right font-mono tabular-nums',
                   info.overridden ? 'font-semibold' : 'text-muted-foreground',
                 )}
-                title={info.overridden ? 'Supply' : 'Suggested supply'}
+                title={info.overridden ? t('build.supply') : t('build.suggestedSupply')}
               >
                 {info.supply}
               </span>

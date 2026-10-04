@@ -1,5 +1,6 @@
-import { type OpponentRace, RACE_NAMES } from '@sybo/shared'
+import type { OpponentRace } from '@sybo/shared'
 import { cn } from 'cn'
+import { useI18n } from '@/i18n'
 
 export const raceClasses: Record<OpponentRace, { solid: string; soft: string; text: string; border: string; on: string }> = {
   T: { solid: 'bg-terran text-terran-foreground', soft: 'bg-terran/15 text-terran', text: 'text-terran', border: 'border-terran/40', on: 'data-[state=on]:bg-terran data-[state=on]:text-terran-foreground' },
@@ -9,6 +10,7 @@ export const raceClasses: Record<OpponentRace, { solid: string; soft: string; te
 }
 
 export function RaceIcon({ race, className }: { race: OpponentRace; className?: string }) {
+  const { t } = useI18n()
   return (
     <span
       className={cn(
@@ -16,7 +18,7 @@ export function RaceIcon({ race, className }: { race: OpponentRace; className?: 
         raceClasses[race].solid,
         className,
       )}
-      title={RACE_NAMES[race]}
+      title={t(`races.${race}`)}
       aria-hidden="true"
     >
       {race}
@@ -26,13 +28,14 @@ export function RaceIcon({ race, className }: { race: OpponentRace; className?: 
 
 /** "PvZ" with each letter tinted by race. */
 export function Matchup({ race, vsRace, className }: { race: OpponentRace; vsRace: OpponentRace; className?: string }) {
+  const { t } = useI18n()
   return (
     <span
       className={cn('inline-flex items-center gap-1 font-heading text-sm font-bold', className)}
-      aria-label={`${RACE_NAMES[race]} versus ${RACE_NAMES[vsRace]}`}
+      aria-label={t('matchup', { race: t(`races.${race}`), vsRace: t(`races.${vsRace}`) })}
     >
       <RaceIcon race={race} />
-      <span className="text-xs text-muted-foreground">vs</span>
+      <span className="text-xs text-muted-foreground">{t('common.vs')}</span>
       <RaceIcon race={vsRace} />
     </span>
   )

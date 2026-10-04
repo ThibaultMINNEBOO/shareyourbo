@@ -7,6 +7,7 @@ import { ActionLabel } from '@/components/build/action-chip'
 import { Matchup } from '@/components/build/race'
 import { Button } from '@/components/ui/button'
 import { Kbd } from '@/components/ui/kbd'
+import { useI18n } from '@/i18n'
 import { StepList } from './step-list'
 import { useGameClock, useWakeLock } from './use-game-clock'
 
@@ -17,6 +18,7 @@ export function PlayMode({ slug, title, race, vsRace, steps }: Props) {
   const supplies = useMemo(() => computeSupply(race, steps), [race, steps])
   const [position, setPosition] = useState(0)
   const clock = useGameClock()
+  const { t } = useI18n()
   const listRef = useRef<HTMLDivElement>(null)
   useWakeLock(true)
 
@@ -66,7 +68,7 @@ export function PlayMode({ slug, title, race, vsRace, steps }: Props) {
         <Matchup race={race} vsRace={vsRace} />
         <h1 className="truncate font-heading text-base font-semibold">{title}</h1>
         <Button variant="ghost" size="icon" className="ml-auto" asChild>
-          <Link to="/b/$slug" params={{ slug }} aria-label="Exit play mode">
+          <Link to="/b/$slug" params={{ slug }} aria-label={t('play.exit')}>
             <XIcon />
           </Link>
         </Button>
@@ -79,12 +81,12 @@ export function PlayMode({ slug, title, race, vsRace, steps }: Props) {
         <main className="flex flex-col items-center justify-center gap-10 p-6">
           <div className="flex items-baseline gap-6 font-mono tabular-nums">
             <div className="flex flex-col items-center">
-              <span className="text-xs tracking-widest text-muted-foreground uppercase">Supply</span>
+              <span className="text-xs tracking-widest text-muted-foreground uppercase">{t('play.supply')}</span>
               <span className={cn('text-5xl font-semibold', supply.blocked && 'text-destructive')}>{supply.supply}</span>
             </div>
             {current.step.time !== undefined && (
               <div className="flex flex-col items-center">
-                <span className="text-xs tracking-widest text-muted-foreground uppercase">At</span>
+                <span className="text-xs tracking-widest text-muted-foreground uppercase">{t('play.at')}</span>
                 <span className="text-5xl font-semibold">{formatTime(current.step.time)}</span>
               </div>
             )}
@@ -97,7 +99,7 @@ export function PlayMode({ slug, title, race, vsRace, steps }: Props) {
 
           {upcoming.length > 0 && (
             <div className="flex flex-col items-center gap-2 opacity-60">
-              <span className="text-xs tracking-widest text-muted-foreground uppercase">Next</span>
+              <span className="text-xs tracking-widest text-muted-foreground uppercase">{t('play.next')}</span>
               {upcoming.map(({ step, index }) => (
                 <div key={step.id} className="flex items-center gap-3 text-sm">
                   <span className="w-8 text-right font-mono text-muted-foreground">{supplies[index]!.supply}</span>
@@ -108,23 +110,23 @@ export function PlayMode({ slug, title, race, vsRace, steps }: Props) {
           )}
 
           <div className="flex flex-col items-center gap-3">
-            <div className="font-mono text-3xl tabular-nums" aria-label="Game clock">
+            <div className="font-mono text-3xl tabular-nums" aria-label={t('play.clock')}>
               {formatTime(clock.seconds)}
             </div>
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="icon-lg" onClick={() => go(-1)} disabled={position === 0} aria-label="Previous step">
+              <Button variant="outline" size="icon-lg" onClick={() => go(-1)} disabled={position === 0} aria-label={t('play.previous')}>
                 <ChevronLeftIcon />
               </Button>
               <Button size="lg" onClick={clock.toggle} className="min-w-32">
                 {clock.running ? <PauseIcon data-icon="inline-start" /> : <PlayIcon data-icon="inline-start" />}
-                {clock.running ? 'Pause' : clock.seconds > 0 ? 'Resume' : 'Start clock'}
+                {clock.running ? t('play.pause') : clock.seconds > 0 ? t('play.resume') : t('play.start')}
               </Button>
               <Button
                 variant="outline"
                 size="icon-lg"
                 onClick={() => go(1)}
                 disabled={position === playable.length - 1}
-                aria-label="Next step"
+                aria-label={t('play.nextStep')}
               >
                 <ChevronRightIcon />
               </Button>
@@ -135,19 +137,19 @@ export function PlayMode({ slug, title, race, vsRace, steps }: Props) {
                   clock.reset()
                   setPosition(0)
                 }}
-                aria-label="Restart"
+                aria-label={t('play.restart')}
               >
                 <RotateCcwIcon />
               </Button>
             </div>
             <p className="hidden items-center gap-1.5 text-xs text-muted-foreground sm:flex">
               <Kbd>←</Kbd>
-              <Kbd>→</Kbd> steps <Kbd>Space</Kbd> clock <Kbd>R</Kbd> restart
+              <Kbd>→</Kbd> {t('play.hintSteps')} <Kbd>Space</Kbd> {t('play.hintClock')} <Kbd>R</Kbd> {t('play.hintRestart')}
             </p>
           </div>
         </main>
 
-        <aside ref={listRef} className="hidden overflow-y-auto border-l p-3 lg:block" aria-label="All steps">
+        <aside ref={listRef} className="hidden overflow-y-auto border-l p-3 lg:block" aria-label={t('play.allSteps')}>
           <StepList
             steps={steps}
             race={race}

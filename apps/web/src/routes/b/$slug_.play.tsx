@@ -7,7 +7,7 @@ import { buildQuery } from '@/lib/queries'
 export const Route = createFileRoute('/b/$slug_/play')({
   loader: ({ context, params }) => context.queryClient.ensureQueryData(buildQuery(params.slug)),
   component: PlayPage,
-  errorComponent: () => <NotFound title="Build not found" />,
+  errorComponent: () => <NotFound titleKey="build.notFound" />,
 })
 
 function PlayPage() {

@@ -10,6 +10,7 @@ import { type BrowseFilters, BuildFilters } from '@/components/browse/build-filt
 import { Button } from '@/components/ui/button'
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
 import { Spinner } from '@/components/ui/spinner'
+import { useI18n } from '@/i18n'
 import { buildListQuery } from '@/lib/queries'
 
 const searchSchema = z.object({
@@ -29,6 +30,7 @@ function HomePage() {
   const filters = Route.useSearch()
   const navigate = Route.useNavigate()
   const list = useInfiniteQuery(buildListQuery(filters))
+  const { t } = useI18n()
   const builds = list.data?.pages.flatMap((p) => p.items) ?? []
 
   const onChange = useCallback(
@@ -40,25 +42,24 @@ function HomePage() {
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-10">
       <section className="flex flex-col gap-4">
         <h1 className="font-heading text-4xl font-bold tracking-tight text-balance sm:text-5xl">
-          StarCraft II build orders,
+          {t('home.titleLine1')}
           <br />
-          <span className="text-primary">clear enough to play from.</span>
+          <span className="text-primary">{t('home.titleLine2')}</span>
         </h1>
         <p className="max-w-2xl text-lg text-muted-foreground">
-          Find a build for your matchup, follow it step by step in play mode, or write your own in a couple of
-          minutes.
+          {t('home.intro')}
         </p>
         <div className="flex flex-wrap gap-2">
           <Button size="lg" asChild>
             <Link to="/new">
               <PlusIcon data-icon="inline-start" />
-              Create a build
+              {t('home.createBuild')}
             </Link>
           </Button>
         </div>
       </section>
 
-      <section className="flex flex-col gap-5" aria-label="Builds">
+      <section className="flex flex-col gap-5" aria-label={t('home.buildsSection')}>
         <BuildFilters filters={filters} onChange={onChange} />
 
         {list.isPending ? (
@@ -70,12 +71,12 @@ function HomePage() {
         ) : list.isError ? (
           <Empty className="border">
             <EmptyHeader>
-              <EmptyTitle>Could not load builds</EmptyTitle>
+              <EmptyTitle>{t('home.loadError')}</EmptyTitle>
               <EmptyDescription>{list.error.message}</EmptyDescription>
             </EmptyHeader>
             <EmptyContent>
               <Button variant="outline" onClick={() => list.refetch()}>
-                Try again
+                {t('common.tryAgain')}
               </Button>
             </EmptyContent>
           </Empty>
@@ -85,12 +86,12 @@ function HomePage() {
               <EmptyMedia variant="icon">
                 <SwordsIcon />
               </EmptyMedia>
-              <EmptyTitle>No builds match</EmptyTitle>
-              <EmptyDescription>Try other filters — or be the first to publish one for this matchup.</EmptyDescription>
+              <EmptyTitle>{t('home.emptyTitle')}</EmptyTitle>
+              <EmptyDescription>{t('home.emptyDescription')}</EmptyDescription>
             </EmptyHeader>
             <EmptyContent>
               <Button asChild>
-                <Link to="/new">Create a build</Link>
+                <Link to="/new">{t('home.createBuild')}</Link>
               </Button>
             </EmptyContent>
           </Empty>
@@ -109,7 +110,7 @@ function HomePage() {
                 disabled={list.isFetchingNextPage}
               >
                 {list.isFetchingNextPage && <Spinner data-icon="inline-start" />}
-                Load more
+                {t('home.loadMore')}
               </Button>
             )}
           </>

@@ -4,6 +4,7 @@ import { ActionBadge } from '@/components/build/action-chip'
 import { BuildTags } from '@/components/build/build-tags'
 import { Matchup } from '@/components/build/race'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { useI18n } from '@/i18n'
 import { useFormat } from '@/lib/format'
 import type { BuildSummary } from '@/lib/queries'
 import { getAction } from '@sybo/shared'
@@ -11,13 +12,14 @@ import { getAction } from '@sybo/shared'
 /** Card with the first steps of the build as an "opener" strip. */
 export function BuildCard({ build, showAuthor = true }: { build: BuildSummary; showAuthor?: boolean }) {
   const { compactNumber, timeAgo } = useFormat()
+  const { t } = useI18n()
   return (
     <Card className="group relative gap-4 transition-colors hover:border-primary/50 hover:bg-card/80">
       <CardHeader className="gap-2">
         <div className="flex items-center justify-between gap-2">
           <Matchup race={build.race} vsRace={build.vsRace} />
           {build.visibility !== 'public' && (
-            <span className="text-xs text-muted-foreground capitalize">{build.visibility}</span>
+            <span className="text-xs text-muted-foreground">{t(`visibility.${build.visibility}`)}</span>
           )}
         </div>
         <CardTitle className="font-heading text-lg leading-snug">
@@ -31,12 +33,12 @@ export function BuildCard({ build, showAuthor = true }: { build: BuildSummary; s
         </CardTitle>
         {showAuthor && (
           <CardDescription>
-            by {build.author.displayUsername} · {timeAgo(build.updatedAt)}
+            {t('card.by', { author: build.author.displayUsername, time: timeAgo(build.updatedAt) })}
           </CardDescription>
         )}
       </CardHeader>
       <CardContent className="flex flex-col gap-3">
-        <ol className="flex flex-wrap gap-1.5" aria-label="Opening steps">
+        <ol className="flex flex-wrap gap-1.5" aria-label={t('card.openingSteps')}>
           {build.preview.map((step) => {
             const action = getAction(step.actionId)
             return (
@@ -63,12 +65,12 @@ export function BuildCard({ build, showAuthor = true }: { build: BuildSummary; s
         <span className="flex items-center gap-1">
           <HeartIcon className="size-4" aria-hidden="true" />
           {compactNumber(build.likesCount)}
-          <span className="sr-only">likes</span>
+          <span className="sr-only">{t('common.likes')}</span>
         </span>
         <span className="flex items-center gap-1">
           <ListOrderedIcon className="size-4" aria-hidden="true" />
-          {build.stepCount}
-          <span className="sr-only">steps</span>
+          <span aria-hidden="true">{build.stepCount}</span>
+          <span className="sr-only">{t('common.steps', { count: build.stepCount })}</span>
         </span>
       </CardFooter>
     </Card>

@@ -1,6 +1,7 @@
 import { type ActionKind, type Race, getAction } from '@sybo/shared'
 import { cn } from 'cn'
 import { ArrowUpCircleIcon, Building2Icon, type LucideIcon, SwordsIcon, ZapIcon } from 'lucide-react'
+import { useI18n } from '@/i18n'
 import { raceClasses } from './race'
 
 export const kindIcons: Record<ActionKind, LucideIcon> = {
@@ -40,12 +41,13 @@ export function ActionLabel({
   size?: 'default' | 'lg'
 }) {
   const action = getAction(actionId)
+  const { t } = useI18n()
   const countText = count > 1 && <span className="font-mono text-muted-foreground">×{count}</span>
   if (!action) {
     return (
       <span className={cn('flex min-w-0 items-center gap-2', size === 'lg' && 'text-2xl')}>
         <span className="inline-flex h-6 min-w-10 shrink-0 items-center justify-center rounded border border-dashed text-muted-foreground">
-          <span className="sr-only">Note</span>·
+          <span className="sr-only">{t('build.note')}</span>·
         </span>
         <span className="truncate italic">{label}</span>
         {countText}

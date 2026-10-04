@@ -1,9 +1,9 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { en } from './en'
 import { fr } from './fr'
-import { LOCALES, type Locale, type MessageKey, type Messages, type PluralKey } from './types'
+import { LOCALES, type Locale, type MessageKey, type Messages, type PluralKey, type TextKey } from './types'
 
-export type { Locale, MessageKey } from './types'
+export type { Locale, MessageKey, TextKey } from './types'
 export { LOCALES } from './types'
 
 const DICTIONARIES: Record<Locale, Messages> = { en, fr }
@@ -47,13 +47,13 @@ export function createTranslator(locale: Locale) {
   }
 
   function t(key: PluralKey, vars: Vars & { count: number }): string
-  function t(key: Exclude<MessageKey, PluralKey>, vars?: Vars): string
+  function t(key: TextKey, vars?: Vars): string
   function t(key: MessageKey, vars?: Vars) {
     return interpolate(resolve(key, vars), vars)
   }
 
   /** Like t(), but placeholders can be React nodes (links, <Kbd>…). */
-  function rich(key: Exclude<MessageKey, PluralKey>, nodes: Record<string, React.ReactNode>): React.ReactNode[] {
+  function rich(key: TextKey, nodes: Record<string, React.ReactNode>): React.ReactNode[] {
     return resolve(key)
       .split(/(\{\w+\})/)
       .map((part, i) => {
