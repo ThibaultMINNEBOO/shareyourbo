@@ -11,6 +11,7 @@ export default defineConfig(async () => {
         miniflare: {
           bindings: {
             TEST_MIGRATIONS: migrations,
+            WEB_ORIGIN: "http://localhost:5173",
             BETTER_AUTH_SECRET: "test-secret-test-secret-test-secret",
           },
         },

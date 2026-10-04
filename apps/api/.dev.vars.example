@@ -1,3 +1,4 @@
-# Copy to .dev.vars for local development.
-# Generate with: openssl rand -base64 32
+# Copy to .dev.vars for local development (never committed).
+# Generate the secret with: openssl rand -base64 32
 BETTER_AUTH_SECRET=
+WEB_ORIGIN=http://localhost:5173

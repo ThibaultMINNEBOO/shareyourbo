@@ -5,8 +5,10 @@
   "compatibility_date": "2026-08-22",
   "compatibility_flags": ["nodejs_compat"],
   "observability": { "enabled": true },
+  // Production values. Local dev overrides them in .dev.vars, tests in vitest.config.ts.
   "vars": {
-    "WEB_ORIGIN": "http://localhost:5173"
+    // Public origin of the web app (Vercel), which proxies /api/* to this Worker.
+    "WEB_ORIGIN": "https://shareyourbo.vercel.app"
   },
   "d1_databases": [
     {
