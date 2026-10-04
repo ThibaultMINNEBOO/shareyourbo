@@ -1,5 +1,5 @@
 import type { Race, Step } from "./schemas";
-import { getAction } from "./sc2";
+import { type GameLocale, actionName, getAction } from "./sc2";
 
 export const START_SUPPLY = 12;
 export const MAX_SUPPLY = 200;
@@ -66,20 +66,21 @@ export function computeSupply(race: Race, steps: Step[]): SupplyInfo[] {
   });
 }
 
-export function stepLabel(step: Step) {
-  const name = getAction(step.actionId)?.name ?? step.label ?? "";
+export function stepLabel(step: Step, locale: GameLocale = "en") {
+  const action = getAction(step.actionId);
+  const name = action ? actionName(action, locale) : (step.label ?? "");
   return step.count > 1 ? `${name} x${step.count}` : name;
 }
 
 /** Plain-text export, e.g. for pasting into a notepad or Discord. */
-export function stepsToText(steps: Step[]) {
+export function stepsToText(steps: Step[], locale: GameLocale = "en") {
   return steps
     .map((step) => {
       if (step.kind === "section") return `# ${step.label}`;
       const supply = (step.supply?.toString() ?? "").padEnd(4);
       const time = (step.time !== undefined ? formatTime(step.time) : "").padEnd(6);
       const note = step.note ? ` — ${step.note}` : "";
-      return `${supply}${time}${stepLabel(step)}${note}`;
+      return `${supply}${time}${stepLabel(step, locale)}${note}`;
     })
     .join("\n");
 }

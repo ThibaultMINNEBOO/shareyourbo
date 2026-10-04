@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { RACES } from "../schemas";
-import { ACTIONS_BY_RACE, ALL_ACTIONS, WORKER_ID, getAction, searchActions } from "./index";
+import { ACTION_NAMES_FR, LEVEL_NAMES_FR } from "./names-fr";
+import { ACTIONS_BY_RACE, ALL_ACTIONS, WORKER_ID, actionName, actionShort, getAction, searchActions } from "./index";
 
 describe("sc2 game data", () => {
   it("has unique kebab-case ids", () => {
@@ -53,5 +54,36 @@ describe("searchActions", () => {
 
   it("returns every action for an empty query", () => {
     expect(searchActions("P", "")).toHaveLength(ACTIONS_BY_RACE.P.length);
+  });
+});
+
+describe("french names", () => {
+  it("translates every action", () => {
+    const missing = ALL_ACTIONS.filter((a) => !ACTION_NAMES_FR[a.id] && !LEVEL_NAMES_FR[a.id.replace(/-\d$/, "")]);
+    expect(missing.map((a) => a.id)).toEqual([]);
+  });
+
+  it("uses the official client names", () => {
+    expect(actionName(getAction("pylon")!, "fr")).toBe("Pylône");
+    expect(actionName(getAction("hellion")!, "fr")).toBe("Tourmenteur");
+    expect(actionName(getAction("spawning-pool")!, "fr")).toBe("Bassin génétique");
+    expect(actionName(getAction("infantry-weapons-2")!, "fr")).toBe("Armes d'infanterie niveau 2");
+    expect(actionShort(getAction("infantry-weapons-2")!, "fr")).toBe("AI2");
+  });
+
+  it("keeps french badge labels compact and unique per race", () => {
+    for (const race of RACES) {
+      const shorts = ACTIONS_BY_RACE[race].map((a) => actionShort(a, "fr"));
+      for (const short of shorts) expect(short.length).toBeLessThanOrEqual(4);
+      expect(new Set(shorts).size).toBe(shorts.length);
+    }
+  });
+
+  it("finds actions by french name, ignoring accents", () => {
+    expect(searchActions("P", "pylone")[0]?.id).toBe("pylon");
+    expect(searchActions("T", "caserne")[0]?.id).toBe("barracks");
+    expect(searchActions("Z", "bassin")[0]?.id).toBe("spawning-pool");
+    expect(searchActions("Z", "chancre")[0]?.id).toBe("baneling");
+    expect(searchActions("T", "+1 armes d'infanterie")[0]?.id).toBe("infantry-weapons-1");
   });
 });

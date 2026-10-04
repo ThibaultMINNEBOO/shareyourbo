@@ -1,5 +1,5 @@
 import { parseTime } from "./build-math";
-import { ALL_ACTIONS, type GameAction } from "./sc2";
+import { ALL_ACTIONS, type GameAction, actionName, normalizeSearch } from "./sc2";
 import type { Race, Step } from "./schemas";
 
 export type ImportedStep = Omit<Step, "id">;
@@ -12,7 +12,7 @@ export type ImportResult = {
   unmatched: number;
 };
 
-const normalize = (value: string) => value.toLowerCase().replace(/[^a-z0-9+]/g, "");
+const normalize = normalizeSearch;
 
 function buildIndex() {
   const index = new Map<string, GameAction[]>();
@@ -25,6 +25,7 @@ function buildIndex() {
   };
   for (const action of ALL_ACTIONS) {
     add(action.name, action);
+    add(actionName(action, "fr"), action);
     add(action.id, action);
     for (const alias of action.aliases ?? []) add(alias, action);
   }
@@ -64,7 +65,8 @@ function parseActionPart(part: string) {
 
 /**
  * Parse a pasted build order (Spawning Tool export, Liquipedia-style or
- * free-form "14 Pylon" lines) into steps. Unknown actions become text steps.
+ * free-form "14 Pylon" lines, English or French names) into steps. Unknown
+ * actions become text steps.
  */
 export function parseBuildText(input: string, preferredRace?: Race): ImportResult {
   const steps: ImportedStep[] = [];

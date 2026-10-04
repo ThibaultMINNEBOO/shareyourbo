@@ -51,6 +51,16 @@ describe("parseBuildText", () => {
     expect(parseBuildText("Refinery", "T").steps[0]?.actionId).toBe("refinery");
   });
 
+  it("understands french names", () => {
+    const { steps, race } = parseBuildText("14 0:18 Pylône\n16 Portail\nTraqueur x2");
+    expect(race).toBe("P");
+    expect(steps.map((s) => [s.actionId, s.count])).toEqual([
+      ["pylon", 1],
+      ["gateway", 1],
+      ["stalker", 2],
+    ]);
+  });
+
   it("matches plurals and community abbreviations", () => {
     const { steps } = parseBuildText("Zerglings\nrax");
     expect(steps.map((s) => s.actionId)).toEqual(["zergling", "barracks"]);

@@ -102,6 +102,12 @@ describe("stepsToText", () => {
   });
 });
 
+describe("stepsToText in french", () => {
+  it("uses french action names", () => {
+    expect(stepsToText([s("pylon", { supply: 14 })], "fr")).toBe("14        Pylône");
+  });
+});
+
 describe("slugify", () => {
   it("builds url-safe slugs", () => {
     expect(slugify("PvZ — 2 Base Blink!")).toBe("pvz-2-base-blink");
