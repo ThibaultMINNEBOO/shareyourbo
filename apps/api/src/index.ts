@@ -1,8 +1,9 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
+import type { AppEnv } from "./env";
 
-const app = new Hono<{ Bindings: CloudflareBindings }>().basePath("/api");
+const app = new Hono<AppEnv>().basePath("/api");
 
 app.use(logger());
 app.use("*", async (c, next) =>
